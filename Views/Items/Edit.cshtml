@@ -1,0 +1,41 @@
+@model EquipmentManagement.Models.Item
+
+<h1>備品編集</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label>管理番号</label>
+        <input asp-for="ManagementNumber" readonly />
+        <span asp-validation-for="ManagementNumber"></span>
+    </div>
+
+    <div>
+        <label asp-for="Name">名称</label>
+        <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
+    </div>
+
+    <div>
+        <label asp-for="PurchaseDate">購入日</label>
+        <input asp-for="PurchaseDate" type="date" />
+        <span asp-validation-for="PurchaseDate"></span>
+    </div>
+
+    <div>
+        <label asp-for="Status">状態</label>
+        <select asp-for="Status">
+            <option value="使用中">使用中</option>
+            <option value="保管中">保管中</option>
+            <option value="修理中">修理中</option>
+            <option value="廃棄予定">廃棄予定</option>
+        </select>
+    </div>
+
+    <button type="submit">保存</button>
+</form>
+
+<p>
+    <a asp-action="Index">一覧に戻る</a>
+</p>

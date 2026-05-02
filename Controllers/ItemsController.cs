@@ -26,7 +26,6 @@ public class ItemsController : Controller
     [HttpPost]
     public IActionResult Create(Item item)
     {
-
         if (item.PurchaseDate > DateTime.Today)
         {
             ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
@@ -38,6 +37,58 @@ public class ItemsController : Controller
         }
 
         ItemRepository.Add(item);
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var item = ItemRepository.GetById(id);
+
+        if (item is null)
+        {
+            return NotFound();
+        }
+
+        return View(item);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(Item item)
+    {
+        var existingItem = ItemRepository.GetById(item.Id);
+
+        if (existingItem is null)
+        {
+            return NotFound();
+        }
+
+        if (item.PurchaseDate > DateTime.Today)
+        {
+            ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
+        }
+
+        if (ItemRepository.ExistsManagementNumber(existingItem.ManagementNumber, item.Id))
+        {
+            ModelState.AddModelError(nameof(item.ManagementNumber), "管理番号が重複しています。");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            item.ManagementNumber = existingItem.ManagementNumber;
+            return View(item);
+        }
+
+        ItemRepository.Update(item);
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    public IActionResult Delete(int id)
+    {
+        ItemRepository.Delete(id);
 
         return RedirectToAction(nameof(Index));
     }

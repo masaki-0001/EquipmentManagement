@@ -6,7 +6,7 @@
     <a asp-action="Create">新規登録</a>
 </p>
 
-<table border="2" cellpadding="10">
+<table border="1" cellpadding="8">
     <thead>
         <tr>
             <th>ID</th>
@@ -14,6 +14,7 @@
             <th>管理番号</th>
             <th>購入日</th>
             <th>状態</th>
+            <th>操作</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +26,13 @@
                 <td>@item.ManagementNumber</td>
                 <td>@item.PurchaseDate.ToString("yyyy/MM/dd")</td>
                 <td>@item.Status</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">編集</a>
+
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        <button type="submit">削除</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
