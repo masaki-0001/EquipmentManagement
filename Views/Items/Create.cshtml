@@ -1,0 +1,31 @@
+@model EquipmentManagement.Models.Item
+
+<h1>備品登録</h1>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="Name">名称</label>
+        <input asp-for="Name" />
+    </div>
+
+    <div>
+        <label asp-for="PurchaseDate">購入日</label>
+        <input asp-for="PurchaseDate" type="date" />
+    </div>
+
+    <div>
+        <label asp-for="Status">状態</label>
+        <select asp-for="Status">
+            <option value="使用中">使用中</option>
+            <option value="保管中">保管中</option>
+            <option value="修理中">修理中</option>
+            <option value="廃棄予定">廃棄予定</option>
+        </select>
+    </div>
+
+    <button type="submit">登録</button>
+</form>
+
+<p>
+    <a asp-action="Index">一覧に戻る</a>
+</p>

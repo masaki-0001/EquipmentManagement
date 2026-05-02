@@ -28,4 +28,12 @@ public static class ItemRepository
     {
         return Items;
     }
+
+    public static void Add(Item item)
+    {
+        item.Id = Items.Any() ? Items.Max(x => x.Id) + 1 : 1;
+        item.ManagementNumber = $"ITEM-{item.Id:0000}";
+
+        Items.Add(item);
+    }
 }
