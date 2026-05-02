@@ -26,6 +26,17 @@ public class ItemsController : Controller
     [HttpPost]
     public IActionResult Create(Item item)
     {
+
+        if (item.PurchaseDate > DateTime.Today)
+        {
+            ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(item);
+        }
+
         ItemRepository.Add(item);
 
         return RedirectToAction(nameof(Index));

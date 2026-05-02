@@ -6,11 +6,13 @@
     <div>
         <label asp-for="Name">名称</label>
         <input asp-for="Name" />
+        <span asp-validation-for="Name"></span>
     </div>
 
     <div>
         <label asp-for="PurchaseDate">購入日</label>
         <input asp-for="PurchaseDate" type="date" />
+        <span asp-validation-for="PurchaseDate"></span>
     </div>
 
     <div>
