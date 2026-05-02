@@ -1,3 +1,27 @@
 @model List<EquipmentManagement.Models.Item>
 
 <h1>備品一覧</h1>
+
+<table border="2" cellpadding="10">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>名称</th>
+            <th>管理番号</th>
+            <th>購入日</th>
+            <th>状態</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.ManagementNumber</td>
+                <td>@item.PurchaseDate.ToString("yyyy/MM/dd")</td>
+                <td>@item.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
