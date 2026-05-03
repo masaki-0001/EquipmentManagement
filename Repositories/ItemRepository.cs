@@ -26,18 +26,23 @@ public static class ItemRepository
 
     public static List<Item> GetAll()
     {
-        return Items;
+        return Items
+            .Where(x => !x.IsDeleted)
+            .ToList();
     }
 
     public static Item? GetById(int id)
     {
-        return Items.FirstOrDefault(x => x.Id == id);
+        return Items.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
     }
 
     public static void Add(Item item)
     {
-        item.Id = Items.Any() ? Items.Max(x => x.Id) + 1 : 1;
+        var nextId = Items.Any() ? Items.Max(x => x.Id) + 1 : 1;
+
+        item.Id = nextId;
         item.ManagementNumber = $"ITEM-{item.Id:0000}";
+        item.IsDeleted = false;
 
         Items.Add(item);
     }
@@ -58,11 +63,11 @@ public static class ItemRepository
 
     public static void Delete(int id)
     {
-        var item = GetById(id);
+        var item = Items.FirstOrDefault(x => x.Id == id);
 
         if (item is not null)
         {
-            Items.Remove(item);
+            item.IsDeleted = true;
         }
     }
 
@@ -71,5 +76,22 @@ public static class ItemRepository
         return Items.Any(x =>
             x.ManagementNumber == managementNumber &&
             x.Id != excludeId);
+    }
+
+    public static List<Item> Search(string? keyword)
+    {
+        var query = Items.Where(x => !x.IsDeleted);
+
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            return query.ToList();
+        }
+
+        return query
+            .Where(x =>
+                x.Name.Contains(keyword) ||
+                x.ManagementNumber.Contains(keyword) ||
+                x.Status.Contains(keyword))
+            .ToList();
     }
 }

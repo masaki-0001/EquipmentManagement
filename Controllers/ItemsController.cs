@@ -6,9 +6,11 @@ namespace EquipmentManagement.Controllers;
 
 public class ItemsController : Controller
 {
-    public IActionResult Index()
+    public IActionResult Index(string? keyword)
     {
-        var items = ItemRepository.GetAll();
+        var items = ItemRepository.Search(keyword);
+
+        ViewBag.Keyword = keyword;
 
         return View(items);
     }
@@ -26,6 +28,7 @@ public class ItemsController : Controller
     [HttpPost]
     public IActionResult Create(Item item)
     {
+
         if (item.PurchaseDate > DateTime.Today)
         {
             ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
@@ -44,6 +47,11 @@ public class ItemsController : Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
         var item = ItemRepository.GetById(id);
 
         if (item is null)
@@ -88,6 +96,11 @@ public class ItemsController : Controller
     [HttpPost]
     public IActionResult Delete(int id)
     {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
         ItemRepository.Delete(id);
 
         return RedirectToAction(nameof(Index));

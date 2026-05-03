@@ -15,4 +15,6 @@ public class Item
     public DateTime PurchaseDate { get; set; }
 
     public string Status { get; set; } = string.Empty;
+
+    public bool IsDeleted { get; set; }
 }
