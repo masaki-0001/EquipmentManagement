@@ -1,14 +1,36 @@
 using EquipmentManagement.Models;
 using EquipmentManagement.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using EquipmentManagement.ViewModels;
 
 namespace EquipmentManagement.Controllers;
 
 public class ItemsController : Controller
 {
+    private readonly ItemRepository _itemRepository;
+
+    public ItemsController(ItemRepository itemRepository)
+    {
+        _itemRepository = itemRepository;
+    }
+
+    private static readonly string[] ValidStatuses =
+    {
+        "使用中",
+        "保管中",
+        "修理中",
+        "廃棄済み"
+    };
+
     public IActionResult Index(string? keyword)
     {
-        var items = ItemRepository.Search(keyword);
+        if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length > 100)
+        {
+            ModelState.AddModelError(nameof(keyword), "検索キーワードは100文字以内で入力してください。");
+            keyword = keyword[..100];
+        }
+
+        var items = _itemRepository.Search(keyword);
 
         ViewBag.Keyword = keyword;
 
@@ -18,7 +40,7 @@ public class ItemsController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new Item
+        return View(new CreateItemViewModel
         {
             PurchaseDate = DateTime.Today,
             Status = "使用中"
@@ -26,20 +48,32 @@ public class ItemsController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(Item item)
+    [ValidateAntiForgeryToken]
+    public IActionResult Create(CreateItemViewModel viewModel)
     {
-
-        if (item.PurchaseDate > DateTime.Today)
+        if (viewModel.PurchaseDate > DateTime.Today)
         {
-            ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
+            ModelState.AddModelError(nameof(viewModel.PurchaseDate), "購入日は未来の日付にできません。");
+        }
+
+        if (!ValidStatuses.Contains(viewModel.Status))
+        {
+            ModelState.AddModelError(nameof(viewModel.Status), "不正な状態が指定されています。");
         }
 
         if (!ModelState.IsValid)
         {
-            return View(item);
+            return View(viewModel);
         }
 
-        ItemRepository.Add(item);
+        var item = new Item
+        {
+            Name = viewModel.Name,
+            PurchaseDate = viewModel.PurchaseDate,
+            Status = viewModel.Status
+        };
+
+        _itemRepository.Add(item);
 
         return RedirectToAction(nameof(Index));
     }
@@ -52,48 +86,72 @@ public class ItemsController : Controller
             return BadRequest();
         }
 
-        var item = ItemRepository.GetById(id);
+        var item = _itemRepository.GetById(id);
 
         if (item is null)
         {
             return NotFound();
         }
 
-        return View(item);
+        var viewModel = new EditItemViewModel
+        {
+            Id = item.Id,
+            ManagementNumber = item.ManagementNumber,
+            Name = item.Name,
+            PurchaseDate = item.PurchaseDate,
+            Status = item.Status
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]
-    public IActionResult Edit(Item item)
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(EditItemViewModel viewModel)
     {
-        var existingItem = ItemRepository.GetById(item.Id);
+        if (viewModel.Id <= 0)
+        {
+            return BadRequest();
+        }
+
+        var existingItem = _itemRepository.GetById(viewModel.Id);
 
         if (existingItem is null)
         {
             return NotFound();
         }
 
-        if (item.PurchaseDate > DateTime.Today)
+        if (viewModel.PurchaseDate > DateTime.Today)
         {
-            ModelState.AddModelError(nameof(item.PurchaseDate), "購入日は未来の日付にできません。");
+            ModelState.AddModelError(nameof(viewModel.PurchaseDate), "購入日は未来の日付にできません。");
         }
 
-        if (ItemRepository.ExistsManagementNumber(existingItem.ManagementNumber, item.Id))
+        if (!ValidStatuses.Contains(viewModel.Status))
         {
-            ModelState.AddModelError(nameof(item.ManagementNumber), "管理番号が重複しています。");
+            ModelState.AddModelError(nameof(viewModel.Status), "不正な状態が指定されています。");
         }
 
         if (!ModelState.IsValid)
         {
-            item.ManagementNumber = existingItem.ManagementNumber;
-            return View(item);
+            viewModel.ManagementNumber = existingItem.ManagementNumber;
+            return View(viewModel);
         }
 
-        ItemRepository.Update(item);
+        var item = new Item
+        {
+            Id = viewModel.Id,
+            Name = viewModel.Name,
+            PurchaseDate = viewModel.PurchaseDate,
+            Status = viewModel.Status
+        };
+
+        _itemRepository.Update(item);
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Delete(int id)
     {
         if (id <= 0)
@@ -101,7 +159,7 @@ public class ItemsController : Controller
             return BadRequest();
         }
 
-        ItemRepository.Delete(id);
+        _itemRepository.Delete(id);
 
         return RedirectToAction(nameof(Index));
     }

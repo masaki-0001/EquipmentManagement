@@ -1,53 +1,54 @@
+using EquipmentManagement.Data;
 using EquipmentManagement.Models;
 
 namespace EquipmentManagement.Repositories;
 
-public static class ItemRepository
+public class ItemRepository
 {
-    private static readonly List<Item> Items = new()
-    {
-        new Item
-        {
-            Id = 1,
-            Name = "ノートPC",
-            ManagementNumber = "ITEM-0001",
-            PurchaseDate = new DateTime(2026, 5, 2),
-            Status = "使用中"
-        },
-        new Item
-        {
-            Id = 2,
-            Name = "プロジェクター",
-            ManagementNumber = "ITEM-0002",
-            PurchaseDate = new DateTime(2026, 5, 1),
-            Status = "保管中"
-        }
-    };
+    private readonly AppDbContext _context;
 
-    public static List<Item> GetAll()
+    public ItemRepository(AppDbContext context)
     {
-        return Items
-            .Where(x => !x.IsDeleted)
+        _context = context;
+    }
+
+    public List<Item> Search(string? keyword)
+    {
+        var query = _context.Items
+            .Where(x => !x.IsDeleted);
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query = query.Where(x =>
+                x.Name.Contains(keyword) ||
+                x.ManagementNumber.Contains(keyword) ||
+                x.Status.Contains(keyword));
+        }
+
+        return query
+            .OrderBy(x => x.Id)
             .ToList();
     }
 
-    public static Item? GetById(int id)
+    public Item? GetById(int id)
     {
-        return Items.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+        return _context.Items
+            .FirstOrDefault(x => x.Id == id && !x.IsDeleted);
     }
 
-    public static void Add(Item item)
+    public void Add(Item item)
     {
-        var nextId = Items.Any() ? Items.Max(x => x.Id) + 1 : 1;
-
-        item.Id = nextId;
-        item.ManagementNumber = $"ITEM-{item.Id:0000}";
         item.IsDeleted = false;
 
-        Items.Add(item);
+        _context.Items.Add(item);
+        _context.SaveChanges();
+
+        item.ManagementNumber = $"ITEM-{item.Id:0000}";
+
+        _context.SaveChanges();
     }
 
-    public static void Update(Item item)
+    public void Update(Item item)
     {
         var existingItem = GetById(item.Id);
 
@@ -59,39 +60,28 @@ public static class ItemRepository
         existingItem.Name = item.Name;
         existingItem.PurchaseDate = item.PurchaseDate;
         existingItem.Status = item.Status;
+
+        _context.SaveChanges();
     }
 
-    public static void Delete(int id)
+    public void Delete(int id)
     {
-        var item = Items.FirstOrDefault(x => x.Id == id);
+        var item = GetById(id);
 
-        if (item is not null)
+        if (item is null)
         {
-            item.IsDeleted = true;
+            return;
         }
+
+        item.IsDeleted = true;
+
+        _context.SaveChanges();
     }
 
-    public static bool ExistsManagementNumber(string managementNumber, int? excludeId = null)
+    public bool ExistsManagementNumber(string managementNumber, int? excludeId = null)
     {
-        return Items.Any(x =>
+        return _context.Items.Any(x =>
             x.ManagementNumber == managementNumber &&
             x.Id != excludeId);
-    }
-
-    public static List<Item> Search(string? keyword)
-    {
-        var query = Items.Where(x => !x.IsDeleted);
-
-        if (string.IsNullOrWhiteSpace(keyword))
-        {
-            return query.ToList();
-        }
-
-        return query
-            .Where(x =>
-                x.Name.Contains(keyword) ||
-                x.ManagementNumber.Contains(keyword) ||
-                x.Status.Contains(keyword))
-            .ToList();
     }
 }

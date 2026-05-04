@@ -1,8 +1,9 @@
-@model EquipmentManagement.Models.Item
+@model EquipmentManagement.ViewModels.EditItemViewModel
 
 <h1>備品編集</h1>
 
 <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
 
     <div>
@@ -29,7 +30,7 @@
             <option value="使用中">使用中</option>
             <option value="保管中">保管中</option>
             <option value="修理中">修理中</option>
-            <option value="廃棄予定">廃棄予定</option>
+            <option value="廃棄済み">廃棄済み</option>
         </select>
     </div>
 

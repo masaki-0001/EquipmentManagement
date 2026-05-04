@@ -38,6 +38,7 @@
                     <a asp-action="Edit" asp-route-id="@item.Id">編集</a>
 
                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
                         <button type="submit">削除</button>
                     </form>
                 </td>
