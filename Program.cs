@@ -1,5 +1,5 @@
-using EquipmentManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using EquipmentManagement.Data;
 using EquipmentManagement.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);

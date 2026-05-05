@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using EquipmentManagement.Models;
 using EquipmentManagement.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using EquipmentManagement.ViewModels;
 
 namespace EquipmentManagement.Controllers;
@@ -65,6 +65,7 @@ public class ItemsController : Controller
         {
             return View(viewModel);
         }
+
 
         var item = new Item
         {

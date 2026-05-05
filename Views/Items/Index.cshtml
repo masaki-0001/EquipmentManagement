@@ -6,13 +6,13 @@
     <a asp-action="Create">新規登録</a>
 </p>
 
-<p>
+<div>
     <form asp-action="Index" method="get">
         <input type="text" name="keyword" value="@ViewBag.Keyword" placeholder="名称・管理番号・状態で検索" />
         <button type="submit">検索</button>
         <a asp-action="Index">クリア</a>
     </form>
-</p>
+</div>
 
 <table border="2" cellpadding="10">
     <thead>
@@ -38,8 +38,9 @@
                     <a asp-action="Edit" asp-route-id="@item.Id">編集</a>
 
                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+
                         @Html.AntiForgeryToken()
-                        <button type="submit">削除</button>
+                        <button type="submit" onclick="return confirm('本当に削除しますか？');">削除</button>
                     </form>
                 </td>
             </tr>

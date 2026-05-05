@@ -1,5 +1,6 @@
-using EquipmentManagement.Models;
 using Microsoft.EntityFrameworkCore;
+using EquipmentManagement.Models;
+
 
 namespace EquipmentManagement.Data;
 
