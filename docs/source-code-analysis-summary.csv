@@ -1,0 +1,33 @@
+分類,名称,種別,ファイル,プロパティまたは引数,型または戻り値,説明
+モデル,Item,プロパティ,Models/Item.cs,Id,int,備品ID
+モデル,Item,プロパティ,Models/Item.cs,Name,string,備品名。RequiredおよびStringLength(100)
+モデル,Item,プロパティ,Models/Item.cs,ManagementNumber,string,管理番号。DBでユニーク
+モデル,Item,プロパティ,Models/Item.cs,PurchaseDate,DateTime,購入日。Required
+モデル,Item,プロパティ,Models/Item.cs,Status,string,状態。RequiredおよびStringLength(20)
+モデル,Item,プロパティ,Models/Item.cs,IsDeleted,bool,論理削除フラグ
+ViewModel,CreateItemViewModel,プロパティ,ViewModels/CreateItemViewModel.cs,Name,string,登録する備品名
+ViewModel,CreateItemViewModel,プロパティ,ViewModels/CreateItemViewModel.cs,PurchaseDate,DateTime,登録する購入日
+ViewModel,CreateItemViewModel,プロパティ,ViewModels/CreateItemViewModel.cs,Status,string,登録する状態
+ViewModel,EditItemViewModel,プロパティ,ViewModels/EditItemViewModel.cs,Id,int,編集対象ID
+ViewModel,EditItemViewModel,プロパティ,ViewModels/EditItemViewModel.cs,ManagementNumber,string,管理番号
+ViewModel,EditItemViewModel,プロパティ,ViewModels/EditItemViewModel.cs,Name,string,編集後の備品名
+ViewModel,EditItemViewModel,プロパティ,ViewModels/EditItemViewModel.cs,PurchaseDate,DateTime,編集後の購入日
+ViewModel,EditItemViewModel,プロパティ,ViewModels/EditItemViewModel.cs,Status,string,編集後の状態
+Data,AppDbContext,プロパティ,Data/AppDbContext.cs,Items,DbSet<Item>,Itemsテーブルへのアクセス口
+Data,AppDbContext,メソッド,Data/AppDbContext.cs,OnModelCreating(ModelBuilder modelBuilder),void,ManagementNumberにユニークインデックスを設定
+Repository,ItemRepository,コンストラクター,Repositories/ItemRepository.cs,AppDbContext context,なし,DBコンテキストを受け取る
+Repository,ItemRepository,メソッド,Repositories/ItemRepository.cs,Search(string? keyword),List<Item>,未削除備品を検索する
+Repository,ItemRepository,メソッド,Repositories/ItemRepository.cs,GetById(int id),Item?,指定IDの未削除備品を取得する
+Repository,ItemRepository,メソッド,Repositories/ItemRepository.cs,Add(Item item),void,トランザクション内で備品を追加し管理番号を採番する
+Repository,ItemRepository,メソッド,Repositories/ItemRepository.cs,Update(Item item),void,既存備品の名称・購入日・状態を更新する
+Repository,ItemRepository,メソッド,Repositories/ItemRepository.cs,Delete(int id),void,IsDeletedをtrueにする
+Controller,ItemsController,コンストラクター,Controllers/ItemsController.cs,ItemRepository itemRepository,なし,RepositoryをDIで受け取る
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Index(string? keyword),IActionResult,一覧表示と検索
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Create(),IActionResult,登録画面表示
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Create(CreateItemViewModel viewModel),IActionResult,登録処理
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Edit(int id),IActionResult,編集画面表示
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Edit(EditItemViewModel viewModel),IActionResult,編集保存処理
+Controller,ItemsController,Action,Controllers/ItemsController.cs,Delete(int id),IActionResult,論理削除処理
+画面,Index,View,Views/Items/Index.cshtml,List<Item>,HTML,備品一覧・検索・編集リンク・削除フォーム
+画面,Create,View,Views/Items/Create.cshtml,CreateItemViewModel,HTML,備品登録フォーム
+画面,Edit,View,Views/Items/Edit.cshtml,EditItemViewModel,HTML,備品編集フォーム

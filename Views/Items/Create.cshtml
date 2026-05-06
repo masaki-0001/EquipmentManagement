@@ -4,19 +4,19 @@
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
-    <div>
+    <div style="margin-bottom: 10px;">
         <label asp-for="Name">名称</label>
         <input asp-for="Name" />
         <span asp-validation-for="Name"></span>
     </div>
 
-    <div>
+    <div style="margin-bottom: 10px;">
         <label asp-for="PurchaseDate">購入日</label>
         <input asp-for="PurchaseDate" type="date" />
         <span asp-validation-for="PurchaseDate"></span>
     </div>
 
-    <div>
+    <div style="margin-bottom: 10px;">
         <label asp-for="Status">状態</label>
         <select asp-for="Status">
             <option value="使用中">使用中</option>
