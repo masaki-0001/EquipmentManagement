@@ -32,20 +32,34 @@ public class ItemRepository
 
     public Item? GetById(int id)
     {
+
+
         return _context.Items
             .FirstOrDefault(x => x.Id == id && !x.IsDeleted);
     }
 
     public void Add(Item item)
     {
-        item.IsDeleted = false;
+        using var transaction = _context.Database.BeginTransaction();
 
-        _context.Items.Add(item);
-        _context.SaveChanges();
+        try
+        {
+            item.IsDeleted = false;
 
-        item.ManagementNumber = $"ITEM-{item.Id:0000}";
+            _context.Items.Add(item);
+            _context.SaveChanges();
 
-        _context.SaveChanges();
+            item.ManagementNumber = $"ITEM-{item.Id:0000}";
+
+            _context.SaveChanges();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
     public void Update(Item item)
@@ -78,10 +92,4 @@ public class ItemRepository
         _context.SaveChanges();
     }
 
-    public bool ExistsManagementNumber(string managementNumber, int? excludeId = null)
-    {
-        return _context.Items.Any(x =>
-            x.ManagementNumber == managementNumber &&
-            x.Id != excludeId);
-    }
 }
