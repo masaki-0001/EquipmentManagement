@@ -32,8 +32,6 @@ public class ItemRepository
 
     public Item? GetById(int id)
     {
-
-
         return _context.Items
             .FirstOrDefault(x => x.Id == id && !x.IsDeleted);
     }

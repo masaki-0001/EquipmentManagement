@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using EquipmentManagement.Models;
 
-
 namespace EquipmentManagement.Data;
 
 public class AppDbContext : DbContext
