@@ -1,42 +1,212 @@
 @model EquipmentManagement.ViewModels.EditItemViewModel
 
-<h1>備品編集</h1>
+@{
+    ViewData["Title"] = "備品編集";
+    var categories = ViewBag.Categories as string[] ?? Array.Empty<string>();
+    var locations = ViewBag.Locations as string[] ?? Array.Empty<string>();
+    var statuses = ViewBag.Statuses as string[] ?? Array.Empty<string>();
+}
 
-<form asp-action="Edit" method="post">
+<div class="page-header">
+    <div>
+        <h1 class="page-title">備品編集</h1>
+        <p class="page-description">
+            登録済み備品の情報を更新します。管理番号は自動採番のため変更できません。
+        </p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        一覧に戻る
+    </a>
+</div>
+
+<form asp-action="Edit" method="post" class="item-form">
     @Html.AntiForgeryToken()
+
     <input type="hidden" asp-for="Id" />
 
-    <div style="margin-bottom: 10px;">
-        <label>管理番号</label>
-        <input asp-for="ManagementNumber" readonly />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="form-section-card">
+        <div class="form-section-header">
+            <h2 class="form-section-title">基本情報</h2>
+            <p class="form-section-description">備品を識別するための情報です。</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="ManagementNumber" class="form-label">管理番号</label>
+                <input asp-for="ManagementNumber" class="form-control" readonly />
+                <span asp-validation-for="ManagementNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-field form-field-wide">
+                <label asp-for="Name" class="form-label">名称 <span class="required-mark">必須</span></label>
+                <input asp-for="Name" class="form-control" maxlength="100" placeholder="例：ノートPC Dell Latitude" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="Category" class="form-label">カテゴリ</label>
+                <select asp-for="Category" class="form-select">
+                    <option value="">選択してください</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
-    <div style ="margin-bottom: 10px;">
-        <label asp-for="Name">名称</label>
-        <input asp-for="Name" />
-        <span asp-validation-for="Name"></span>
+    <div class="form-section-card">
+        <div class="form-section-header">
+            <h2 class="form-section-title">購入情報</h2>
+            <p class="form-section-description">購入日と購入金額を更新します。</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="PurchaseDate" class="form-label">購入日 <span class="required-mark">必須</span></label>
+                <input asp-for="PurchaseDate" type="date" class="form-control" />
+                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="PurchasePrice" class="form-label">購入金額</label>
+                <div class="input-group">
+                    <span class="input-group-text">¥</span>
+                    <input type="text"
+                           id="PurchasePrice"
+                           name="PurchasePrice"
+                           value="@FormatPrice(Model.PurchasePrice)"
+                           inputmode="numeric"
+                           class="form-control js-price-input"
+                           placeholder="例：120000"
+                           autocomplete="off" />
+                </div>
+                <span asp-validation-for="PurchasePrice" class="text-danger" id="PurchasePriceError"></span>
+            </div>
+        </div>
     </div>
 
-    <div style="margin-bottom: 10px;">
-        <label asp-for="PurchaseDate">購入日</label>
-        <input asp-for="PurchaseDate" type="date" />
-        <span asp-validation-for="PurchaseDate"></span>
+    <div class="form-section-card">
+        <div class="form-section-header">
+            <h2 class="form-section-title">利用・保管情報</h2>
+            <p class="form-section-description">現在の所在と使用者を更新します。</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="Location" class="form-label">保管場所</label>
+                <select asp-for="Location" class="form-select">
+                    <option value="">選択してください</option>
+                    @foreach (var location in locations)
+                    {
+                        <option value="@location">@location</option>
+                    }
+                </select>
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="AssignedUser" class="form-label">使用者</label>
+                <input asp-for="AssignedUser" class="form-control" maxlength="50" placeholder="例：山田 太郎" />
+                <span asp-validation-for="AssignedUser" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
-    <div style ="margin-bottom: 10px;">
-        <label asp-for="Status">状態</label>
-        <select asp-for="Status">
-            <option value="使用中">使用中</option>
-            <option value="保管中">保管中</option>
-            <option value="修理中">修理中</option>
-            <option value="廃棄済み">廃棄済み</option>
-        </select>
-        <span asp-validation-for="Status"></span>
+    <div class="form-section-card">
+        <div class="form-section-header">
+            <h2 class="form-section-title">管理状態</h2>
+            <p class="form-section-description">備品の現在状態を更新します。</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="Status" class="form-label">状態 <span class="required-mark">必須</span></label>
+                <select asp-for="Status" class="form-select">
+                    @foreach (var status in statuses)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
-    <button type="submit">保存</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">更新する</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">キャンセル</a>
+    </div>
 </form>
 
-<p>
-    <a asp-action="Index">一覧に戻る</a>
-</p>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('.item-form');
+            const priceInput = document.getElementById('PurchasePrice');
+            const priceError = document.getElementById('PurchasePriceError');
+
+            if (!form || !priceInput || !priceError) {
+                return;
+            }
+
+            function validatePurchasePrice() {
+                const value = priceInput.value.trim();
+
+                if (value === '') {
+                    priceError.textContent = '';
+                    priceInput.classList.remove('input-validation-error');
+                    return true;
+                }
+
+                if (!/^[0-9]+$/.test(value)) {
+                    priceError.textContent = '購入金額は1円単位の整数で入力してください。';
+                    priceInput.classList.add('input-validation-error');
+                    return false;
+                }
+
+                const price = Number(value);
+
+                if (price < 0 || price > 999999999) {
+                    priceError.textContent = '購入金額は0円以上999,999,999円以下で入力してください。';
+                    priceInput.classList.add('input-validation-error');
+                    return false;
+                }
+
+                priceError.textContent = '';
+                priceInput.classList.remove('input-validation-error');
+                return true;
+            }
+
+            priceInput.addEventListener('input', validatePurchasePrice);
+
+            form.addEventListener('submit', function (event) {
+                if (!validatePurchasePrice()) {
+                    event.preventDefault();
+                    priceInput.focus();
+                }
+            });
+        });
+    </script>
+}
+
+@functions {
+    private static string FormatPrice(decimal? price)
+    {
+        if (!price.HasValue)
+        {
+            return string.Empty;
+        }
+
+        return decimal.Truncate(price.Value) == price.Value
+            ? price.Value.ToString("0")
+            : price.Value.ToString("0.##");
+    }
+}

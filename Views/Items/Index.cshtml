@@ -1,49 +1,227 @@
 @model List<EquipmentManagement.Models.Item>
 
-<h1>備品一覧</h1>
+@{
+    ViewData["Title"] = "備品一覧";
 
-<p>
-    <a asp-action="Create">新規登録</a>
-</p>
+    var keyword = ViewBag.Keyword as string;
+    var selectedCategory = ViewBag.SelectedCategory as string;
+    var selectedLocation = ViewBag.SelectedLocation as string;
+    var selectedStatus = ViewBag.SelectedStatus as string;
 
-<div style="margin-bottom: 20px;">
-    <form asp-action="Index" method="get">
-        <input type="text" name="keyword" value="@ViewBag.Keyword" placeholder="名称・管理番号・状態で検索" />
-        <button type="submit">検索</button>
-        <a asp-action="Index">クリア</a>
-    </form>
+    var categories = ViewBag.Categories as string[] ?? Array.Empty<string>();
+    var locations = ViewBag.Locations as string[] ?? Array.Empty<string>();
+    var statuses = ViewBag.Statuses as string[] ?? Array.Empty<string>();
+
+    var activeConditions = new List<string>();
+
+    if (!string.IsNullOrWhiteSpace(keyword))
+    {
+        activeConditions.Add($"キーワード：{keyword}");
+    }
+
+    if (!string.IsNullOrWhiteSpace(selectedCategory))
+    {
+        activeConditions.Add($"カテゴリ：{selectedCategory}");
+    }
+
+    if (!string.IsNullOrWhiteSpace(selectedLocation))
+    {
+        activeConditions.Add($"保管場所：{selectedLocation}");
+    }
+
+    if (!string.IsNullOrWhiteSpace(selectedStatus))
+    {
+        activeConditions.Add($"状態：{selectedStatus}");
+    }
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">備品一覧</h1>
+        <p class="page-description">
+            登録済み備品の管理番号、所在、使用者、状態を確認できます。
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        新規登録
+    </a>
 </div>
 
-<table border="2" cellpadding="10">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>名称</th>
-            <th>管理番号</th>
-            <th>購入日</th>
-            <th>状態</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<div class="summary-card">
+    <div class="summary-item">
+        <span class="summary-label">表示件数</span>
+        <span class="summary-value">@Model.Count 件</span>
+    </div>
+
+    <div class="summary-item summary-item-wide">
+        <span class="summary-label">検索条件</span>
+        <span class="summary-value">
+            @if (activeConditions.Any())
+            {
+                @string.Join(" / ", activeConditions)
+            }
+            else
+            {
+                <span>指定なし</span>
+            }
+        </span>
+    </div>
+</div>
+
+<form asp-action="Index" method="get" class="search-panel search-panel-grid">
+    <div class="search-field search-field-keyword">
+        <label for="keyword" class="form-label">キーワード検索</label>
+        <input type="text"
+               id="keyword"
+               name="keyword"
+               value="@keyword"
+               class="form-control"
+               maxlength="100"
+               placeholder="名称・管理番号・使用者で検索" />
+    </div>
+
+    <div class="search-field">
+        <label for="category" class="form-label">カテゴリ</label>
+        <select id="category" name="category" class="form-select">
+            <option value="">すべて</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category" selected="@(category == selectedCategory)">@category</option>
+            }
+        </select>
+    </div>
+
+    <div class="search-field">
+        <label for="location" class="form-label">保管場所</label>
+        <select id="location" name="location" class="form-select">
+            <option value="">すべて</option>
+            @foreach (var location in locations)
+            {
+                <option value="@location" selected="@(location == selectedLocation)">@location</option>
+            }
+        </select>
+    </div>
+
+    <div class="search-field">
+        <label for="status" class="form-label">状態</label>
+        <select id="status" name="status" class="form-select">
+            <option value="">すべて</option>
+            @foreach (var status in statuses)
+            {
+                <option value="@status" selected="@(status == selectedStatus)">@status</option>
+            }
+        </select>
+    </div>
+
+    <div class="search-actions search-actions-grid">
+        <button type="submit" class="btn btn-outline-primary">検索</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">クリア</a>
+    </div>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(x => x.Errors))
         {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Name</td>
-                <td>@item.ManagementNumber</td>
-                <td>@item.PurchaseDate.ToString("yyyy/MM/dd")</td>
-                <td>@item.Status</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">編集</a>
-
-                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
-
-                        @Html.AntiForgeryToken()
-                        <button type="submit" onclick="return confirm('本当に削除しますか？');">削除</button>
-                    </form>
-                </td>
-            </tr>
+            <div>@error.ErrorMessage</div>
         }
-    </tbody>
-</table>
+    </div>
+}
+
+<div class="table-responsive item-list-wrapper">
+    <table class="table table-hover align-middle item-list-table">
+        <thead class="table-light">
+            <tr>
+                <th>管理番号</th>
+                <th>名称</th>
+                <th>カテゴリ</th>
+                <th>購入日</th>
+                <th class="text-end">購入金額</th>
+                <th>保管場所</th>
+                <th>使用者</th>
+                <th>状態</th>
+                <th>最終更新</th>
+                <th class="text-nowrap">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap item-management-number">@item.ManagementNumber</td>
+                        <td class="item-name">@item.Name</td>
+                        <td>@DisplayText(item.Category)</td>
+                        <td class="text-nowrap">@item.PurchaseDate.ToString("yyyy/MM/dd")</td>
+                        <td class="text-end text-nowrap">
+                            @if (item.PurchasePrice.HasValue)
+                            {
+                                <span>¥@item.PurchasePrice.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">未入力</span>
+                            }
+                        </td>
+                        <td>@DisplayText(item.Location)</td>
+                        <td>@DisplayText(item.AssignedUser)</td>
+                        <td>
+                            <span class="status-badge @GetStatusClass(item.Status)">
+                                @item.Status
+                            </span>
+                        </td>
+                        <td class="text-nowrap">@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                        <td class="text-nowrap">
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                編集
+                            </a>
+
+                            <form asp-action="Delete"
+                                  asp-route-id="@item.Id"
+                                  method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('この備品を削除します。よろしいですか？');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    削除
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="empty-message">
+                        条件に一致する備品はありません。
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    private static string DisplayText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "未入力" : value;
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "使用中" => "status-in-use",
+            "保管中" => "status-storage",
+            "修理中" => "status-repair",
+            "廃棄済み" => "status-disposed",
+            _ => "status-default"
+        };
+    }
+}

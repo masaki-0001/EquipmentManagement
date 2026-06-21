@@ -12,7 +12,11 @@ public class ItemRepository
         _context = context;
     }
 
-    public List<Item> Search(string? keyword)
+    public List<Item> Search(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status)
     {
         var query = _context.Items
             .Where(x => !x.IsDeleted);
@@ -22,7 +26,22 @@ public class ItemRepository
             query = query.Where(x =>
                 x.Name.Contains(keyword) ||
                 x.ManagementNumber.Contains(keyword) ||
-                x.Status.Contains(keyword));
+                (x.AssignedUser != null && x.AssignedUser.Contains(keyword)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            query = query.Where(x => x.Category == category);
+        }
+
+        if (!string.IsNullOrWhiteSpace(location))
+        {
+            query = query.Where(x => x.Location == location);
+        }
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(x => x.Status == status);
         }
 
         return query
@@ -42,7 +61,11 @@ public class ItemRepository
 
         try
         {
+            var now = DateTime.Now;
+
             item.IsDeleted = false;
+            item.CreatedAt = now;
+            item.UpdatedAt = now;
 
             _context.Items.Add(item);
             _context.SaveChanges();
@@ -71,7 +94,12 @@ public class ItemRepository
 
         existingItem.Name = item.Name;
         existingItem.PurchaseDate = item.PurchaseDate;
+        existingItem.PurchasePrice = item.PurchasePrice;
         existingItem.Status = item.Status;
+        existingItem.Category = item.Category;
+        existingItem.Location = item.Location;
+        existingItem.AssignedUser = item.AssignedUser;
+        existingItem.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
     }
@@ -86,8 +114,8 @@ public class ItemRepository
         }
 
         item.IsDeleted = true;
+        item.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
     }
-
 }

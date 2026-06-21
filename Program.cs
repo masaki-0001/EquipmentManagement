@@ -5,7 +5,15 @@ using EquipmentManagement.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(_ => "数値を入力してください。");
+    options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, fieldName) => $"{fieldName}の値が不正です。");
+    options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(fieldName => $"{fieldName}は必須です。");
+    options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => "入力値が不足しています。");
+    options.ModelBindingMessageProvider.SetUnknownValueIsInvalidAccessor(fieldName => $"{fieldName}の値が不正です。");
+    options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(value => $"{value}は不正な値です。");
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=equipment.db"));
@@ -18,7 +26,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Items/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -33,6 +40,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Items}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

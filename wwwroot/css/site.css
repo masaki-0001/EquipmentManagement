@@ -29,3 +29,270 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Item list screen */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.page-title {
+    margin-bottom: 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.page-description {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+.summary-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.summary-item {
+    min-width: 160px;
+}
+
+.summary-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.summary-value {
+    font-weight: 600;
+}
+
+.search-panel {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+}
+
+.search-field {
+    flex: 1;
+}
+
+.search-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.item-list-wrapper {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+}
+
+.item-list-table {
+    margin-bottom: 0;
+}
+
+    .item-list-table th {
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+.item-management-number {
+    font-weight: 600;
+    color: #495057;
+}
+
+.item-name {
+    min-width: 180px;
+    font-weight: 600;
+}
+
+.status-badge {
+    display: inline-block;
+    min-width: 64px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.status-in-use {
+    color: #0f5132;
+    background-color: #d1e7dd;
+}
+
+.status-storage {
+    color: #084298;
+    background-color: #cfe2ff;
+}
+
+.status-repair {
+    color: #664d03;
+    background-color: #fff3cd;
+}
+
+.status-disposed {
+    color: #842029;
+    background-color: #f8d7da;
+}
+
+.status-default {
+    color: #41464b;
+    background-color: #e2e3e5;
+}
+
+.empty-message {
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+@media (max-width: 767.98px) {
+    .page-header,
+    .search-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-actions {
+        justify-content: flex-start;
+    }
+}
+
+/* Item list search filters */
+.summary-item-wide {
+    flex: 1;
+    min-width: 260px;
+}
+
+.search-panel-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+    align-items: end;
+}
+
+.search-field-keyword {
+    min-width: 260px;
+}
+
+.search-actions-grid {
+    align-self: end;
+}
+
+@media (max-width: 1199.98px) {
+    .search-panel-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+
+    .search-actions-grid {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .search-panel-grid {
+        display: flex;
+    }
+}
+
+/* Item create/edit form */
+.item-form {
+    max-width: 960px;
+}
+
+.form-section-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.form-section-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-section-title {
+    margin-bottom: 0.25rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.form-section-description {
+    margin-bottom: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.form-field-wide {
+    grid-column: span 2;
+}
+
+.required-mark {
+    display: inline-block;
+    margin-left: 0.25rem;
+    padding: 0.1rem 0.35rem;
+    color: #842029;
+    background-color: #f8d7da;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.input-validation-error {
+    border-color: #dc3545;
+}
+
+.field-validation-error {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+}
+
+input[readonly] {
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 767.98px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-field-wide {
+        grid-column: span 1;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

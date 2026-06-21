@@ -13,4 +13,16 @@ public class Item
     public string Status { get; set; } = string.Empty;
 
     public bool IsDeleted { get; set; }
+
+    public decimal? PurchasePrice { get; set; }
+
+    public string? Category { get; set; }
+
+    public string? Location { get; set; }
+
+    public string? AssignedUser { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
 }
