@@ -104,18 +104,43 @@ public class ItemRepository
         _context.SaveChanges();
     }
 
-    public void Delete(int id)
+    public bool MarkAsDisposed(int id)
     {
         var item = GetById(id);
 
         if (item is null)
         {
-            return;
+            return false;
+        }
+
+        item.Status = "廃棄済み";
+        item.AssignedUser = null;
+        item.UpdatedAt = DateTime.Now;
+
+        _context.SaveChanges();
+
+        return true;
+    }
+
+    public bool Delete(int id)
+    {
+        var item = GetById(id);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        if (item.Status != "廃棄済み")
+        {
+            return false;
         }
 
         item.IsDeleted = true;
         item.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
+
+        return true;
     }
 }

@@ -48,6 +48,20 @@
     </a>
 </div>
 
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
 <div class="summary-card">
     <div class="summary-item">
         <span class="summary-label">表示件数</span>
@@ -174,23 +188,39 @@
                             </span>
                         </td>
                         <td class="text-nowrap">@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
-                        <td class="text-nowrap">
+                        <td class="text-nowrap item-action-cell">
                             <a asp-action="Edit"
                                asp-route-id="@item.Id"
                                class="btn btn-sm btn-outline-primary">
                                 編集
                             </a>
 
-                            <form asp-action="Delete"
-                                  asp-route-id="@item.Id"
-                                  method="post"
-                                  class="d-inline"
-                                  onsubmit="return confirm('この備品を削除します。よろしいですか？');">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    削除
-                                </button>
-                            </form>
+                            @if (item.Status != "廃棄済み")
+                            {
+                                <form asp-action="MarkAsDisposed"
+                                      asp-route-id="@item.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('この備品の状態を廃棄済みに変更します。よろしいですか？');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                                        廃棄済みにする
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Delete"
+                                      asp-route-id="@item.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('この廃棄済み備品を台帳から非表示にします。よろしいですか？');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        台帳から非表示
+                                    </button>
+                                </form>
+                            }
                         </td>
                     </tr>
                 }

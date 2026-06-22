@@ -296,3 +296,14 @@ input[readonly] {
         align-items: stretch;
     }
 }
+
+/* Item action buttons */
+.item-action-cell .btn,
+.item-action-cell form {
+    margin-right: 0.25rem;
+}
+
+    .item-action-cell .btn:last-child,
+    .item-action-cell form:last-child {
+        margin-right: 0;
+    }

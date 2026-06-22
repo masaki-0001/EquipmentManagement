@@ -145,6 +145,7 @@ public class ItemsController : Controller
         };
 
         _itemRepository.Add(item);
+        TempData["SuccessMessage"] = "備品を登録しました。";
 
         return RedirectToAction(nameof(Index));
     }
@@ -240,6 +241,29 @@ public class ItemsController : Controller
         };
 
         _itemRepository.Update(item);
+        TempData["SuccessMessage"] = "備品情報を更新しました。";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult MarkAsDisposed(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
+        var updated = _itemRepository.MarkAsDisposed(id);
+
+        if (!updated)
+        {
+            TempData["ErrorMessage"] = "対象の備品が見つかりませんでした。";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["SuccessMessage"] = "備品の状態を廃棄済みに変更しました。";
 
         return RedirectToAction(nameof(Index));
     }
@@ -253,7 +277,15 @@ public class ItemsController : Controller
             return BadRequest();
         }
 
-        _itemRepository.Delete(id);
+        var deleted = _itemRepository.Delete(id);
+
+        if (!deleted)
+        {
+            TempData["ErrorMessage"] = "台帳から非表示にできるのは、状態が廃棄済みの備品だけです。";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["SuccessMessage"] = "廃棄済みの備品を台帳から非表示にしました。";
 
         return RedirectToAction(nameof(Index));
     }
