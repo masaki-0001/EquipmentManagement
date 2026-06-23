@@ -1,0 +1,142 @@
+﻿@model EquipmentManagement.Models.Item
+
+@{
+    ViewData["Title"] = "備品詳細";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">備品詳細</h1>
+        <p class="page-description">
+            備品の登録内容、所在、状態、更新日時を確認します。
+        </p>
+    </div>
+
+    <div class="detail-header-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+            編集する
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            一覧に戻る
+        </a>
+    </div>
+</div>
+
+<div class="detail-summary-card">
+    <div>
+        <span class="detail-summary-label">管理番号</span>
+        <span class="detail-summary-value">@Model.ManagementNumber</span>
+    </div>
+
+    <div>
+        <span class="detail-summary-label">状態</span>
+        <span class="status-badge @GetStatusClass(Model.Status)">
+            @Model.Status
+        </span>
+    </div>
+</div>
+
+<div class="detail-section-card">
+    <div class="detail-section-header">
+        <h2 class="detail-section-title">基本情報</h2>
+    </div>
+
+    <dl class="detail-grid">
+        <div class="detail-item detail-item-wide">
+            <dt>名称</dt>
+            <dd>@Model.Name</dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>カテゴリ</dt>
+            <dd>@DisplayText(Model.Category)</dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>管理番号</dt>
+            <dd>@Model.ManagementNumber</dd>
+        </div>
+    </dl>
+</div>
+
+<div class="detail-section-card">
+    <div class="detail-section-header">
+        <h2 class="detail-section-title">購入情報</h2>
+    </div>
+
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>購入日</dt>
+            <dd>@Model.PurchaseDate.ToString("yyyy/MM/dd")</dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>購入金額</dt>
+            <dd>
+                @if (Model.PurchasePrice.HasValue)
+                {
+                <span>¥@Model.PurchasePrice.Value.ToString("N0")</span>
+                }
+                else
+                {
+                <span class="text-muted">未入力</span>
+                }
+            </dd>
+        </div>
+    </dl>
+</div>
+
+<div class="detail-section-card">
+    <div class="detail-section-header">
+        <h2 class="detail-section-title">利用・保管情報</h2>
+    </div>
+
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>保管場所</dt>
+            <dd>@DisplayText(Model.Location)</dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>使用者</dt>
+            <dd>@DisplayText(Model.AssignedUser)</dd>
+        </div>
+    </dl>
+</div>
+
+<div class="detail-section-card">
+    <div class="detail-section-header">
+        <h2 class="detail-section-title">管理情報</h2>
+    </div>
+
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>登録日時</dt>
+            <dd>@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm")</dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>最終更新日時</dt>
+            <dd>@Model.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</dd>
+        </div>
+    </dl>
+</div>
+
+@functions {
+    private static string DisplayText(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "未入力" : value;
+    }
+
+    private static string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "使用中" => "status-in-use",
+            "保管中" => "status-storage",
+            "修理中" => "status-repair",
+            "廃棄済み" => "status-disposed",
+            _ => "status-default"
+        };
+    }
+}

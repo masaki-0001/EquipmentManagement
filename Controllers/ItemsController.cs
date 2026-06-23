@@ -48,6 +48,15 @@ public class ItemsController : Controller
         ViewBag.Locations = ValidLocations;
     }
 
+    private void ValidatePurchasePrice(decimal? purchasePrice, string fieldName)
+    {
+        if (purchasePrice.HasValue &&
+            decimal.Truncate(purchasePrice.Value) != purchasePrice.Value)
+        {
+            ModelState.AddModelError(fieldName, "購入金額は1円単位の整数で入力してください。");
+        }
+    }
+
     public IActionResult Index(
         string? keyword,
         string? category,
@@ -110,6 +119,8 @@ public class ItemsController : Controller
             ModelState.AddModelError(nameof(viewModel.PurchaseDate), "購入日は未来の日付にできません。");
         }
 
+        ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
+
         if (!ValidStatuses.Contains(viewModel.Status))
         {
             ModelState.AddModelError(nameof(viewModel.Status), "不正な状態が指定されています。");
@@ -148,6 +159,24 @@ public class ItemsController : Controller
         TempData["SuccessMessage"] = "備品を登録しました。";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult Details(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
+        var item = _itemRepository.GetById(id);
+
+        if (item is null)
+        {
+            return NotFound();
+        }
+
+        return View(item);
     }
 
     [HttpGet]
@@ -203,6 +232,8 @@ public class ItemsController : Controller
         {
             ModelState.AddModelError(nameof(viewModel.PurchaseDate), "購入日は未来の日付にできません。");
         }
+
+        ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
 
         if (!ValidStatuses.Contains(viewModel.Status))
         {

@@ -189,6 +189,11 @@
                         </td>
                         <td class="text-nowrap">@item.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</td>
                         <td class="text-nowrap item-action-cell">
+                            <a asp-action="Details"
+                               asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-secondary">
+                                詳細
+                            </a>
                             <a asp-action="Edit"
                                asp-route-id="@item.Id"
                                class="btn btn-sm btn-outline-primary">

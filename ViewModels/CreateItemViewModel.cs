@@ -11,6 +11,7 @@ public class CreateItemViewModel
     [Required(ErrorMessage = "購入日は必須です")]
     public DateTime PurchaseDate { get; set; }
 
+    [Display(Name = "購入金額")]
     [Range(typeof(decimal), "0", "999999999", ErrorMessage = "購入金額は0円以上999,999,999円以下で入力してください")]
     public decimal? PurchasePrice { get; set; }
 
