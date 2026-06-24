@@ -19,6 +19,9 @@ public class EditItemViewModel
     [Range(typeof(decimal), "0", "999999999", ErrorMessage = "購入金額は0円以上999,999,999円以下で入力してください")]
     public decimal? PurchasePrice { get; set; }
 
+    [Display(Name = "保証期限")]
+    public DateTime? WarrantyUntil { get; set; }
+
     [StringLength(50, ErrorMessage = "カテゴリは50文字以内で入力してください")]
     public string? Category { get; set; }
 
@@ -30,4 +33,7 @@ public class EditItemViewModel
 
     [Required(ErrorMessage = "状態は必須です")]
     public string Status { get; set; } = string.Empty;
+
+    [StringLength(1000, ErrorMessage = "備考は1000文字以内で入力してください")]
+    public string? Note { get; set; }
 }

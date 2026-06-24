@@ -1,4 +1,4 @@
-﻿@model EquipmentManagement.Models.Item
+@model EquipmentManagement.Models.Item
 
 @{
     ViewData["Title"] = "備品詳細";
@@ -61,7 +61,7 @@
 
 <div class="detail-section-card">
     <div class="detail-section-header">
-        <h2 class="detail-section-title">購入情報</h2>
+        <h2 class="detail-section-title">購入・保証情報</h2>
     </div>
 
     <dl class="detail-grid">
@@ -75,11 +75,25 @@
             <dd>
                 @if (Model.PurchasePrice.HasValue)
                 {
-                <span>¥@Model.PurchasePrice.Value.ToString("N0")</span>
+                    <span>¥@Model.PurchasePrice.Value.ToString("N0")</span>
                 }
                 else
                 {
-                <span class="text-muted">未入力</span>
+                    <span class="text-muted">未入力</span>
+                }
+            </dd>
+        </div>
+
+        <div class="detail-item">
+            <dt>保証期限</dt>
+            <dd>
+                @if (Model.WarrantyUntil.HasValue)
+                {
+                    <span>@Model.WarrantyUntil.Value.ToString("yyyy/MM/dd")</span>
+                }
+                else
+                {
+                    <span class="text-muted">未入力</span>
                 }
             </dd>
         </div>
@@ -118,6 +132,11 @@
         <div class="detail-item">
             <dt>最終更新日時</dt>
             <dd>@Model.UpdatedAt.ToString("yyyy/MM/dd HH:mm")</dd>
+        </div>
+
+        <div class="detail-item detail-item-wide">
+            <dt>備考</dt>
+            <dd class="detail-note">@DisplayText(Model.Note)</dd>
         </div>
     </dl>
 </div>
