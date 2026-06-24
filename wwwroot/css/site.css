@@ -400,3 +400,8 @@ input[readonly] {
         grid-column: span 1;
     }
 }
+/* Item warranty/note fields */
+.detail-note {
+    white-space: pre-wrap;
+    line-height: 1.7;
+}

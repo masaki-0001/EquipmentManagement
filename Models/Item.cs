@@ -16,11 +16,15 @@ public class Item
 
     public decimal? PurchasePrice { get; set; }
 
+    public DateTime? WarrantyUntil { get; set; }
+
     public string? Category { get; set; }
 
     public string? Location { get; set; }
 
     public string? AssignedUser { get; set; }
+
+    public string? Note { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

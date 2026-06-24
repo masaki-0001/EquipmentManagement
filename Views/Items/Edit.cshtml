@@ -62,8 +62,8 @@
 
     <div class="form-section-card">
         <div class="form-section-header">
-            <h2 class="form-section-title">購入情報</h2>
-            <p class="form-section-description">購入日と購入金額を更新します。</p>
+            <h2 class="form-section-title">購入・保証情報</h2>
+            <p class="form-section-description">購入日、購入金額、保証期限を更新します。</p>
         </div>
 
         <div class="form-grid">
@@ -87,6 +87,12 @@
                            autocomplete="off" />
                 </div>
                 <span asp-validation-for="PurchasePrice" class="text-danger" id="PurchasePriceError"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="WarrantyUntil" class="form-label">保証期限</label>
+                <input asp-for="WarrantyUntil" type="date" class="form-control" />
+                <span asp-validation-for="WarrantyUntil" class="text-danger"></span>
             </div>
         </div>
     </div>
@@ -120,8 +126,8 @@
 
     <div class="form-section-card">
         <div class="form-section-header">
-            <h2 class="form-section-title">管理状態</h2>
-            <p class="form-section-description">備品の現在状態を更新します。</p>
+            <h2 class="form-section-title">管理状態・備考</h2>
+            <p class="form-section-description">備品の現在状態と補足情報を更新します。</p>
         </div>
 
         <div class="form-grid">
@@ -134,6 +140,16 @@
                     }
                 </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-field form-field-wide">
+                <label asp-for="Note" class="form-label">備考</label>
+                <textarea asp-for="Note"
+                          class="form-control"
+                          rows="4"
+                          maxlength="1000"
+                          placeholder="例：付属品、修理履歴、管理上の注意点など"></textarea>
+                <span asp-validation-for="Note" class="text-danger"></span>
             </div>
         </div>
     </div>

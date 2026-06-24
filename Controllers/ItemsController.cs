@@ -57,6 +57,14 @@ public class ItemsController : Controller
         }
     }
 
+    private void ValidateWarrantyUntil(DateTime purchaseDate, DateTime? warrantyUntil, string fieldName)
+    {
+        if (warrantyUntil.HasValue && warrantyUntil.Value.Date < purchaseDate.Date)
+        {
+            ModelState.AddModelError(fieldName, "保証期限は購入日以降の日付を入力してください。");
+        }
+    }
+
     public IActionResult Index(
         string? keyword,
         string? category,
@@ -120,6 +128,7 @@ public class ItemsController : Controller
         }
 
         ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
+        ValidateWarrantyUntil(viewModel.PurchaseDate, viewModel.WarrantyUntil, nameof(viewModel.WarrantyUntil));
 
         if (!ValidStatuses.Contains(viewModel.Status))
         {
@@ -149,10 +158,12 @@ public class ItemsController : Controller
             Name = viewModel.Name,
             PurchaseDate = viewModel.PurchaseDate,
             PurchasePrice = viewModel.PurchasePrice,
+            WarrantyUntil = viewModel.WarrantyUntil,
             Category = viewModel.Category,
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
-            Status = viewModel.Status
+            Status = viewModel.Status,
+            Note = viewModel.Note
         };
 
         _itemRepository.Add(item);
@@ -201,10 +212,12 @@ public class ItemsController : Controller
             Name = item.Name,
             PurchaseDate = item.PurchaseDate,
             PurchasePrice = item.PurchasePrice,
+            WarrantyUntil = item.WarrantyUntil,
             Category = item.Category,
             Location = item.Location,
             AssignedUser = item.AssignedUser,
-            Status = item.Status
+            Status = item.Status,
+            Note = item.Note
         };
 
         SetSelectLists();
@@ -234,6 +247,7 @@ public class ItemsController : Controller
         }
 
         ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
+        ValidateWarrantyUntil(viewModel.PurchaseDate, viewModel.WarrantyUntil, nameof(viewModel.WarrantyUntil));
 
         if (!ValidStatuses.Contains(viewModel.Status))
         {
@@ -265,10 +279,12 @@ public class ItemsController : Controller
             Name = viewModel.Name,
             PurchaseDate = viewModel.PurchaseDate,
             PurchasePrice = viewModel.PurchasePrice,
+            WarrantyUntil = viewModel.WarrantyUntil,
             Category = viewModel.Category,
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
-            Status = viewModel.Status
+            Status = viewModel.Status,
+            Note = viewModel.Note
         };
 
         _itemRepository.Update(item);

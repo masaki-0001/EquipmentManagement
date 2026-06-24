@@ -95,10 +95,12 @@ public class ItemRepository
         existingItem.Name = item.Name;
         existingItem.PurchaseDate = item.PurchaseDate;
         existingItem.PurchasePrice = item.PurchasePrice;
+        existingItem.WarrantyUntil = item.WarrantyUntil;
         existingItem.Status = item.Status;
         existingItem.Category = item.Category;
         existingItem.Location = item.Location;
         existingItem.AssignedUser = item.AssignedUser;
+        existingItem.Note = item.Note;
         existingItem.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
