@@ -16,7 +16,8 @@ public class ItemRepository
         string? keyword,
         string? category,
         string? location,
-        string? status)
+        string? status,
+        string? sortOrder)
     {
         var query = _context.Items
             .Where(x => !x.IsDeleted);
@@ -44,9 +45,26 @@ public class ItemRepository
             query = query.Where(x => x.Status == status);
         }
 
-        return query
-            .OrderBy(x => x.Id)
-            .ToList();
+        query = sortOrder switch
+        {
+            "purchaseDateDesc" => query
+                .OrderByDescending(x => x.PurchaseDate)
+                .ThenBy(x => x.ManagementNumber),
+
+            "updatedAtDesc" => query
+                .OrderByDescending(x => x.UpdatedAt)
+                .ThenBy(x => x.ManagementNumber),
+
+            "warrantyUntilAsc" => query
+                .OrderBy(x => x.WarrantyUntil == null)
+                .ThenBy(x => x.WarrantyUntil)
+                .ThenBy(x => x.ManagementNumber),
+
+            _ => query
+                .OrderBy(x => x.ManagementNumber)
+        };
+
+        return query.ToList();
     }
 
     public Item? GetById(int id)
@@ -95,10 +113,12 @@ public class ItemRepository
         existingItem.Name = item.Name;
         existingItem.PurchaseDate = item.PurchaseDate;
         existingItem.PurchasePrice = item.PurchasePrice;
+        existingItem.WarrantyUntil = item.WarrantyUntil;
         existingItem.Status = item.Status;
         existingItem.Category = item.Category;
         existingItem.Location = item.Location;
         existingItem.AssignedUser = item.AssignedUser;
+        existingItem.Note = item.Note;
         existingItem.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();

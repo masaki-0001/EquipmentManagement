@@ -9,10 +9,7 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(_ => "数値を入力してください。");
     options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, fieldName) => $"{fieldName}の値が不正です。");
-    options.ModelBindingMessageProvider.SetMissingBindRequiredValueAccessor(fieldName => $"{fieldName}は必須です。");
-    options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => "入力値が不足しています。");
-    options.ModelBindingMessageProvider.SetUnknownValueIsInvalidAccessor(fieldName => $"{fieldName}の値が不正です。");
-    options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(value => $"{value}は不正な値です。");
+    options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(_ => "入力値が不正です。");
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>

@@ -400,3 +400,29 @@ input[readonly] {
         grid-column: span 1;
     }
 }
+/* Item warranty/note fields */
+.detail-note {
+    white-space: pre-wrap;
+    line-height: 1.7;
+}
+
+/* Item list sort filter */
+.search-panel-grid-with-sort {
+    grid-template-columns: minmax(260px, 2fr) repeat(4, minmax(140px, 1fr)) auto;
+}
+
+@media (max-width: 1399.98px) {
+    .search-panel-grid-with-sort {
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+    }
+
+    .search-panel-grid-with-sort .search-actions-grid {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .search-panel-grid-with-sort {
+        display: flex;
+    }
+}

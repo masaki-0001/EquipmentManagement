@@ -41,11 +41,20 @@ public class ItemsController : Controller
         "その他"
     };
 
+    private static readonly Dictionary<string, string> SortOptions = new()
+    {
+        { "managementNumber", "管理番号順" },
+        { "purchaseDateDesc", "購入日が新しい順" },
+        { "updatedAtDesc", "更新日が新しい順" },
+        { "warrantyUntilAsc", "保証期限が近い順" }
+    };
+
     private void SetSelectLists()
     {
         ViewBag.Statuses = ValidStatuses;
         ViewBag.Categories = ValidCategories;
         ViewBag.Locations = ValidLocations;
+        ViewBag.SortOptions = SortOptions;
     }
 
     private void ValidatePurchasePrice(decimal? purchasePrice, string fieldName)
@@ -57,11 +66,20 @@ public class ItemsController : Controller
         }
     }
 
+    private void ValidateWarrantyUntil(DateTime purchaseDate, DateTime? warrantyUntil, string fieldName)
+    {
+        if (warrantyUntil.HasValue && warrantyUntil.Value.Date < purchaseDate.Date)
+        {
+            ModelState.AddModelError(fieldName, "保証期限は購入日以降の日付を入力してください。");
+        }
+    }
+
     public IActionResult Index(
         string? keyword,
         string? category,
         string? location,
-        string? status)
+        string? status,
+        string? sortOrder)
     {
         if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length > 100)
         {
@@ -87,12 +105,24 @@ public class ItemsController : Controller
             status = null;
         }
 
-        var items = _itemRepository.Search(keyword, category, location, status);
+        if (string.IsNullOrWhiteSpace(sortOrder))
+        {
+            sortOrder = "managementNumber";
+        }
+
+        if (!SortOptions.ContainsKey(sortOrder))
+        {
+            ModelState.AddModelError(nameof(sortOrder), "不正な並び順が指定されています。");
+            sortOrder = "managementNumber";
+        }
+
+        var items = _itemRepository.Search(keyword, category, location, status, sortOrder);
 
         ViewBag.Keyword = keyword;
         ViewBag.SelectedCategory = category;
         ViewBag.SelectedLocation = location;
         ViewBag.SelectedStatus = status;
+        ViewBag.SelectedSortOrder = sortOrder;
         SetSelectLists();
 
         return View(items);
@@ -120,6 +150,7 @@ public class ItemsController : Controller
         }
 
         ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
+        ValidateWarrantyUntil(viewModel.PurchaseDate, viewModel.WarrantyUntil, nameof(viewModel.WarrantyUntil));
 
         if (!ValidStatuses.Contains(viewModel.Status))
         {
@@ -149,10 +180,12 @@ public class ItemsController : Controller
             Name = viewModel.Name,
             PurchaseDate = viewModel.PurchaseDate,
             PurchasePrice = viewModel.PurchasePrice,
+            WarrantyUntil = viewModel.WarrantyUntil,
             Category = viewModel.Category,
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
-            Status = viewModel.Status
+            Status = viewModel.Status,
+            Note = viewModel.Note
         };
 
         _itemRepository.Add(item);
@@ -201,10 +234,12 @@ public class ItemsController : Controller
             Name = item.Name,
             PurchaseDate = item.PurchaseDate,
             PurchasePrice = item.PurchasePrice,
+            WarrantyUntil = item.WarrantyUntil,
             Category = item.Category,
             Location = item.Location,
             AssignedUser = item.AssignedUser,
-            Status = item.Status
+            Status = item.Status,
+            Note = item.Note
         };
 
         SetSelectLists();
@@ -234,6 +269,7 @@ public class ItemsController : Controller
         }
 
         ValidatePurchasePrice(viewModel.PurchasePrice, nameof(viewModel.PurchasePrice));
+        ValidateWarrantyUntil(viewModel.PurchaseDate, viewModel.WarrantyUntil, nameof(viewModel.WarrantyUntil));
 
         if (!ValidStatuses.Contains(viewModel.Status))
         {
@@ -265,10 +301,12 @@ public class ItemsController : Controller
             Name = viewModel.Name,
             PurchaseDate = viewModel.PurchaseDate,
             PurchasePrice = viewModel.PurchasePrice,
+            WarrantyUntil = viewModel.WarrantyUntil,
             Category = viewModel.Category,
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
-            Status = viewModel.Status
+            Status = viewModel.Status,
+            Note = viewModel.Note
         };
 
         _itemRepository.Update(item);

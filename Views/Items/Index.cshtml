@@ -7,10 +7,12 @@
     var selectedCategory = ViewBag.SelectedCategory as string;
     var selectedLocation = ViewBag.SelectedLocation as string;
     var selectedStatus = ViewBag.SelectedStatus as string;
+    var selectedSortOrder = ViewBag.SelectedSortOrder as string ?? "managementNumber";
 
     var categories = ViewBag.Categories as string[] ?? Array.Empty<string>();
     var locations = ViewBag.Locations as string[] ?? Array.Empty<string>();
     var statuses = ViewBag.Statuses as string[] ?? Array.Empty<string>();
+    var sortOptions = ViewBag.SortOptions as Dictionary<string, string> ?? new Dictionary<string, string>();
 
     var activeConditions = new List<string>();
 
@@ -32,6 +34,11 @@
     if (!string.IsNullOrWhiteSpace(selectedStatus))
     {
         activeConditions.Add($"状態：{selectedStatus}");
+    }
+
+    if (sortOptions.TryGetValue(selectedSortOrder, out var selectedSortLabel))
+    {
+        activeConditions.Add($"並び順：{selectedSortLabel}");
     }
 }
 
@@ -83,7 +90,7 @@
     </div>
 </div>
 
-<form asp-action="Index" method="get" class="search-panel search-panel-grid">
+<form asp-action="Index" method="get" class="search-panel search-panel-grid search-panel-grid-with-sort">
     <div class="search-field search-field-keyword">
         <label for="keyword" class="form-label">キーワード検索</label>
         <input type="text"
@@ -128,6 +135,16 @@
         </select>
     </div>
 
+    <div class="search-field">
+        <label for="sortOrder" class="form-label">並び順</label>
+        <select id="sortOrder" name="sortOrder" class="form-select">
+            @foreach (var option in sortOptions)
+            {
+                <option value="@option.Key" selected="@(option.Key == selectedSortOrder)">@option.Value</option>
+            }
+        </select>
+    </div>
+
     <div class="search-actions search-actions-grid">
         <button type="submit" class="btn btn-outline-primary">検索</button>
         <a asp-action="Index" class="btn btn-outline-secondary">クリア</a>
@@ -153,6 +170,7 @@
                 <th>カテゴリ</th>
                 <th>購入日</th>
                 <th class="text-end">購入金額</th>
+                <th>保証期限</th>
                 <th>保管場所</th>
                 <th>使用者</th>
                 <th>状態</th>
@@ -174,6 +192,16 @@
                             @if (item.PurchasePrice.HasValue)
                             {
                                 <span>¥@item.PurchasePrice.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">未入力</span>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            @if (item.WarrantyUntil.HasValue)
+                            {
+                                <span>@item.WarrantyUntil.Value.ToString("yyyy/MM/dd")</span>
                             }
                             else
                             {
@@ -233,7 +261,7 @@
             else
             {
                 <tr>
-                    <td colspan="10" class="empty-message">
+                    <td colspan="11" class="empty-message">
                         条件に一致する備品はありません。
                     </td>
                 </tr>
