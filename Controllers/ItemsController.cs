@@ -79,8 +79,11 @@ public class ItemsController : Controller
         string? category,
         string? location,
         string? status,
-        string? sortOrder)
+        string? sortOrder,
+        int page = 1)
     {
+        const int pageSize = 20;
+
         if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length > 100)
         {
             ModelState.AddModelError(nameof(keyword), "検索キーワードは100文字以内で入力してください。");
@@ -116,16 +119,38 @@ public class ItemsController : Controller
             sortOrder = "managementNumber";
         }
 
-        var items = _itemRepository.Search(keyword, category, location, status, sortOrder);
+        if (page < 1)
+        {
+            page = 1;
+        }
 
-        ViewBag.Keyword = keyword;
-        ViewBag.SelectedCategory = category;
-        ViewBag.SelectedLocation = location;
-        ViewBag.SelectedStatus = status;
-        ViewBag.SelectedSortOrder = sortOrder;
+        var totalCount = _itemRepository.CountSearch(keyword, category, location, status);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        if (totalPages > 0 && page > totalPages)
+        {
+            page = totalPages;
+        }
+
+        var items = _itemRepository.Search(keyword, category, location, status, sortOrder, page, pageSize);
+
+        var viewModel = new ItemIndexViewModel
+        {
+            Items = items,
+            Keyword = keyword,
+            Category = category,
+            Location = location,
+            Status = status,
+            SortOrder = sortOrder,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
+
         SetSelectLists();
 
-        return View(items);
+        return View(viewModel);
     }
 
     [HttpGet]

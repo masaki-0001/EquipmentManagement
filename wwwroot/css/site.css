@@ -426,3 +426,28 @@ input[readonly] {
         display: flex;
     }
 }
+
+/* Item list pagination */
+.pagination-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 767.98px) {
+    .pagination-area {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+    }
+}

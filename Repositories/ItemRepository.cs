@@ -12,12 +12,49 @@ public class ItemRepository
         _context = context;
     }
 
+    public int CountSearch(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status)
+    {
+        return BuildSearchQuery(keyword, category, location, status)
+            .Count();
+    }
+
     public List<Item> Search(
         string? keyword,
         string? category,
         string? location,
         string? status,
-        string? sortOrder)
+        string? sortOrder,
+        int page,
+        int pageSize)
+    {
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize < 1)
+        {
+            pageSize = 20;
+        }
+
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplySort(query, sortOrder);
+
+        return query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private IQueryable<Item> BuildSearchQuery(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status)
     {
         var query = _context.Items
             .Where(x => !x.IsDeleted);
@@ -45,7 +82,12 @@ public class ItemRepository
             query = query.Where(x => x.Status == status);
         }
 
-        query = sortOrder switch
+        return query;
+    }
+
+    private static IQueryable<Item> ApplySort(IQueryable<Item> query, string? sortOrder)
+    {
+        return sortOrder switch
         {
             "purchaseDateDesc" => query
                 .OrderByDescending(x => x.PurchaseDate)
@@ -63,8 +105,6 @@ public class ItemRepository
             _ => query
                 .OrderBy(x => x.ManagementNumber)
         };
-
-        return query.ToList();
     }
 
     public Item? GetById(int id)
