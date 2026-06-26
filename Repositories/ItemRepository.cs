@@ -50,6 +50,19 @@ public class ItemRepository
             .ToList();
     }
 
+    public List<Item> SearchForCsv(
+    string? keyword,
+    string? category,
+    string? location,
+    string? status,
+    string? sortOrder)
+    {
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplySort(query, sortOrder);
+
+        return query.ToList();
+    }
+
     private IQueryable<Item> BuildSearchQuery(
         string? keyword,
         string? category,

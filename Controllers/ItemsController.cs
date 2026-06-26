@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using EquipmentManagement.Models;
 using EquipmentManagement.Repositories;
@@ -72,6 +73,88 @@ public class ItemsController : Controller
         {
             ModelState.AddModelError(fieldName, "保証期限は購入日以降の日付を入力してください。");
         }
+    }
+
+    private static string BuildCsv(List<Item> items)
+    {
+        var builder = new StringBuilder();
+
+        builder.AppendLine(string.Join(",",
+            CsvEscape("管理番号"),
+            CsvEscape("名称"),
+            CsvEscape("カテゴリ"),
+            CsvEscape("購入日"),
+            CsvEscape("購入金額"),
+            CsvEscape("保証期限"),
+            CsvEscape("保管場所"),
+            CsvEscape("使用者"),
+            CsvEscape("状態"),
+            CsvEscape("備考"),
+            CsvEscape("登録日時"),
+            CsvEscape("更新日時")));
+
+        foreach (var item in items)
+        {
+            builder.AppendLine(string.Join(",",
+                CsvEscape(item.ManagementNumber),
+                CsvEscape(item.Name),
+                CsvEscape(item.Category),
+                CsvEscape(FormatDate(item.PurchaseDate)),
+                CsvEscape(FormatPrice(item.PurchasePrice)),
+                CsvEscape(FormatDate(item.WarrantyUntil)),
+                CsvEscape(item.Location),
+                CsvEscape(item.AssignedUser),
+                CsvEscape(item.Status),
+                CsvEscape(item.Note),
+                CsvEscape(FormatDateTime(item.CreatedAt)),
+                CsvEscape(FormatDateTime(item.UpdatedAt))));
+        }
+
+        return builder.ToString();
+    }
+
+    private static string CsvEscape(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return "";
+        }
+
+        var escapedValue = value.Replace("\"", "\"\"");
+
+        if (escapedValue.Contains(',') ||
+            escapedValue.Contains('"') ||
+            escapedValue.Contains('\r') ||
+            escapedValue.Contains('\n'))
+        {
+            return $"\"{escapedValue}\"";
+        }
+
+        return escapedValue;
+    }
+
+    private static string FormatDate(DateTime date)
+    {
+        return date.ToString("yyyy/MM/dd");
+    }
+
+    private static string FormatDate(DateTime? date)
+    {
+        return date.HasValue
+            ? date.Value.ToString("yyyy/MM/dd")
+            : "";
+    }
+
+    private static string FormatDateTime(DateTime dateTime)
+    {
+        return dateTime.ToString("yyyy/MM/dd HH:mm");
+    }
+
+    private static string FormatPrice(decimal? price)
+    {
+        return price.HasValue
+            ? price.Value.ToString("0")
+            : "";
     }
 
     public IActionResult Index(
@@ -151,6 +234,59 @@ public class ItemsController : Controller
         SetSelectLists();
 
         return View(viewModel);
+    }
+
+    [HttpGet]
+    public IActionResult ExportCsv(
+    string? keyword,
+    string? category,
+    string? location,
+    string? status,
+    string? sortOrder)
+    {
+        if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length > 100)
+        {
+            keyword = keyword[..100];
+        }
+
+        if (!string.IsNullOrWhiteSpace(category) && !ValidCategories.Contains(category))
+        {
+            category = null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(location) && !ValidLocations.Contains(location))
+        {
+            location = null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(status) && !ValidStatuses.Contains(status))
+        {
+            status = null;
+        }
+
+        if (string.IsNullOrWhiteSpace(sortOrder))
+        {
+            sortOrder = "managementNumber";
+        }
+
+        if (!SortOptions.ContainsKey(sortOrder))
+        {
+            sortOrder = "managementNumber";
+        }
+
+        var items = _itemRepository.SearchForCsv(keyword, category, location, status, sortOrder);
+
+        var csv = BuildCsv(items);
+        var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+
+        var preamble = encoding.GetPreamble();
+        var csvBytes = encoding.GetBytes(csv);
+
+        var bytes = preamble.Concat(csvBytes).ToArray();
+
+        var fileName = $"備品一覧_{DateTime.Now:yyyyMMddHHmmss}.csv";
+
+        return File(bytes, "text/csv; charset=utf-8", fileName);
     }
 
     [HttpGet]

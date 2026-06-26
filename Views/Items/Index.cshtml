@@ -59,9 +59,21 @@
         </p>
     </div>
 
-    <a asp-action="Create" class="btn btn-primary">
-        新規登録
-    </a>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportCsv"
+           asp-route-keyword="@Model.Keyword"
+           asp-route-category="@Model.Category"
+           asp-route-location="@Model.Location"
+           asp-route-status="@Model.Status"
+           asp-route-sortOrder="@Model.SortOrder"
+           class="btn btn-outline-success">
+            CSV出力
+        </a>
+
+        <a asp-action="Create" class="btn btn-primary">
+            新規登録
+        </a>
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] is string successMessage)
