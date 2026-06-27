@@ -124,6 +124,25 @@
         </span>
     </div>
 
+    @if (Model.HasWarrantyAlerts)
+    {
+        <div class="warranty-alert-panel">
+            @if (Model.ExpiredWarrantyCount > 0)
+            {
+                <div class="warranty-alert warranty-alert-expired">
+                    保証期限切れ：@Model.ExpiredWarrantyCount 件
+                </div>
+            }
+
+            @if (Model.ExpiringWarrantyCount > 0)
+            {
+                <div class="warranty-alert warranty-alert-expiring">
+                    30日以内に保証期限：@Model.ExpiringWarrantyCount 件
+                </div>
+            }
+        </div>
+    }
+
     <div class="summary-item summary-item-wide">
         <span class="summary-label">検索条件</span>
         <span class="summary-value">
@@ -252,7 +271,17 @@
                         <td class="text-nowrap">
                             @if (item.WarrantyUntil.HasValue)
                             {
-                                <span>@item.WarrantyUntil.Value.ToString("yyyy/MM/dd")</span>
+                                <div>@item.WarrantyUntil.Value.ToString("yyyy/MM/dd")</div>
+
+                                var warrantyLabel = GetWarrantyLabel(item.WarrantyUntil);
+                                var warrantyClass = GetWarrantyClass(item.WarrantyUntil);
+
+                                @if (!string.IsNullOrWhiteSpace(warrantyLabel))
+                                {
+                                    <span class="warranty-badge @warrantyClass">
+                                        @warrantyLabel
+                                    </span>
+                                }
                             }
                             else
                             {
@@ -432,5 +461,49 @@
             "廃棄済み" => "status-disposed",
             _ => "status-default"
         };
+    }
+
+    private static string GetWarrantyLabel(DateTime? warrantyUntil)
+    {
+        if (!warrantyUntil.HasValue)
+        {
+            return string.Empty;
+        }
+
+        var today = DateTime.Today;
+
+        if (warrantyUntil.Value.Date < today)
+        {
+            return "期限切れ";
+        }
+
+        if (warrantyUntil.Value.Date <= today.AddDays(30))
+        {
+            return "30日以内";
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetWarrantyClass(DateTime? warrantyUntil)
+    {
+        if (!warrantyUntil.HasValue)
+        {
+            return string.Empty;
+        }
+
+        var today = DateTime.Today;
+
+        if (warrantyUntil.Value.Date < today)
+        {
+            return "warranty-expired";
+        }
+
+        if (warrantyUntil.Value.Date <= today.AddDays(30))
+        {
+            return "warranty-expiring";
+        }
+
+        return string.Empty;
     }
 }

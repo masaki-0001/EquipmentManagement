@@ -22,6 +22,36 @@ public class ItemRepository
             .Count();
     }
 
+    public int CountExpiredWarranty(
+    string? keyword,
+    string? category,
+    string? location,
+    string? status,
+    DateTime today)
+    {
+        return BuildSearchQuery(keyword, category, location, status)
+            .Where(x => x.Status != "廃棄済み")
+            .Where(x => x.WarrantyUntil.HasValue && x.WarrantyUntil.Value < today)
+            .Count();
+    }
+
+    public int CountExpiringWarranty(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status,
+        DateTime today,
+        DateTime limitDate)
+    {
+        return BuildSearchQuery(keyword, category, location, status)
+            .Where(x => x.Status != "廃棄済み")
+            .Where(x =>
+                x.WarrantyUntil.HasValue &&
+                x.WarrantyUntil.Value >= today &&
+                x.WarrantyUntil.Value <= limitDate)
+            .Count();
+    }
+
     public List<Item> Search(
         string? keyword,
         string? category,

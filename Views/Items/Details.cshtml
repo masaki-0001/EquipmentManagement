@@ -36,6 +36,19 @@
     </div>
 </div>
 
+@if (IsWarrantyExpired(Model.WarrantyUntil))
+{
+    <div class="warranty-detail-alert warranty-alert-expired">
+        この備品は保証期限が切れています。
+    </div>
+}
+else if (IsWarrantyExpiringSoon(Model.WarrantyUntil))
+{
+    <div class="warranty-detail-alert warranty-alert-expiring">
+        この備品は30日以内に保証期限を迎えます。
+    </div>
+}
+
 <div class="detail-section-card">
     <div class="detail-section-header">
         <h2 class="detail-section-title">基本情報</h2>
@@ -157,5 +170,18 @@
             "廃棄済み" => "status-disposed",
             _ => "status-default"
         };
+    }
+
+    private static bool IsWarrantyExpired(DateTime? warrantyUntil)
+    {
+        return warrantyUntil.HasValue &&
+               warrantyUntil.Value.Date < DateTime.Today;
+    }
+
+    private static bool IsWarrantyExpiringSoon(DateTime? warrantyUntil)
+    {
+        return warrantyUntil.HasValue &&
+               warrantyUntil.Value.Date >= DateTime.Today &&
+               warrantyUntil.Value.Date <= DateTime.Today.AddDays(30);
     }
 }

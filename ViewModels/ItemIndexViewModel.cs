@@ -17,8 +17,14 @@ public class ItemIndexViewModel
     public int TotalCount { get; set; }
     public int TotalPages { get; set; }
 
+    public int ExpiredWarrantyCount { get; set; }
+    public int ExpiringWarrantyCount { get; set; }
+
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
+
+    public bool HasWarrantyAlerts =>
+        ExpiredWarrantyCount > 0 || ExpiringWarrantyCount > 0;
 
     public int FirstItemNumber => TotalCount == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;
     public int LastItemNumber => Math.Min(CurrentPage * PageSize, TotalCount);

@@ -210,6 +210,24 @@ public class ItemsController : Controller
         var totalCount = _itemRepository.CountSearch(keyword, category, location, status);
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
+        var today = DateTime.Today;
+        var warrantyAlertLimitDate = today.AddDays(30);
+
+        var expiredWarrantyCount = _itemRepository.CountExpiredWarranty(
+            keyword,
+            category,
+            location,
+            status,
+            today);
+
+        var expiringWarrantyCount = _itemRepository.CountExpiringWarranty(
+            keyword,
+            category,
+            location,
+            status,
+            today,
+            warrantyAlertLimitDate);
+
         if (totalPages > 0 && page > totalPages)
         {
             page = totalPages;
@@ -228,7 +246,9 @@ public class ItemsController : Controller
             CurrentPage = page,
             PageSize = pageSize,
             TotalCount = totalCount,
-            TotalPages = totalPages
+            TotalPages = totalPages,
+            ExpiredWarrantyCount = expiredWarrantyCount,
+            ExpiringWarrantyCount = expiringWarrantyCount
         };
 
         SetSelectLists();
