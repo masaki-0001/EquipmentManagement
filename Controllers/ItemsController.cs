@@ -228,6 +228,18 @@ public class ItemsController : Controller
             today,
             warrantyAlertLimitDate);
 
+        var statusCounts = _itemRepository.CountByStatus(
+            keyword,
+            category,
+            location,
+            status);
+
+        var categoryCounts = _itemRepository.CountByCategory(
+            keyword,
+            category,
+            location,
+            status);
+
         if (totalPages > 0 && page > totalPages)
         {
             page = totalPages;
@@ -248,7 +260,9 @@ public class ItemsController : Controller
             TotalCount = totalCount,
             TotalPages = totalPages,
             ExpiredWarrantyCount = expiredWarrantyCount,
-            ExpiringWarrantyCount = expiringWarrantyCount
+            ExpiringWarrantyCount = expiringWarrantyCount,
+            StatusCounts = statusCounts,
+            CategoryCounts = categoryCounts
         };
 
         SetSelectLists();

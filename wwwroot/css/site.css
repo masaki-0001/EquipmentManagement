@@ -4,7 +4,7 @@ html {
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -106,10 +106,10 @@ body {
     margin-bottom: 0;
 }
 
-    .item-list-table th {
-        white-space: nowrap;
-        font-weight: 600;
-    }
+.item-list-table th {
+    white-space: nowrap;
+    font-weight: 600;
+}
 
 .item-management-number {
     font-weight: 600;
@@ -503,4 +503,59 @@ input[readonly] {
     padding: 0.875rem 1rem;
     border-radius: 0.5rem;
     font-weight: 700;
+}
+
+/* Dashboard summary */
+.dashboard-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.dashboard-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.dashboard-card-header {
+    padding: 0.75rem 1rem;
+    font-weight: 700;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dashboard-card-body {
+    padding: 0.75rem 1rem;
+}
+
+.dashboard-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+    .dashboard-count-row:last-child {
+        border-bottom: none;
+    }
+
+.dashboard-count-label {
+    color: #212529;
+}
+
+.dashboard-count-value {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .dashboard-section {
+        grid-template-columns: 1fr;
+    }
 }

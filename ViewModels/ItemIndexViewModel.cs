@@ -20,6 +20,9 @@ public class ItemIndexViewModel
     public int ExpiredWarrantyCount { get; set; }
     public int ExpiringWarrantyCount { get; set; }
 
+    public Dictionary<string, int> StatusCounts { get; set; } = new();
+    public Dictionary<string, int> CategoryCounts { get; set; } = new();
+
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
 

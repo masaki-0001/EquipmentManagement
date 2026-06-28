@@ -52,6 +52,35 @@ public class ItemRepository
             .Count();
     }
 
+    public Dictionary<string, int> CountByStatus(
+    string? keyword,
+    string? category,
+    string? location,
+    string? status)
+    {
+        return BuildSearchQuery(keyword, category, location, status)
+            .GroupBy(x => x.Status)
+            .Select(x => new
+            {
+                Status = x.Key,
+                Count = x.Count()
+            })
+            .ToDictionary(x => x.Status, x => x.Count);
+    }
+
+    public Dictionary<string, int> CountByCategory(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status)
+    {
+        return BuildSearchQuery(keyword, category, location, status)
+            .Select(x => x.Category)
+            .AsEnumerable()
+            .GroupBy(x => string.IsNullOrWhiteSpace(x) ? "未入力" : x)
+            .ToDictionary(x => x.Key, x => x.Count());
+    }
+
     public List<Item> Search(
         string? keyword,
         string? category,

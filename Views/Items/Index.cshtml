@@ -157,6 +157,59 @@
         </span>
     </div>
 </div>
+<div class="dashboard-section">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            状態別件数
+        </div>
+
+        <div class="dashboard-card-body">
+            @foreach (var statusName in statuses)
+            {
+                var count = Model.StatusCounts.TryGetValue(statusName, out var statusCount)
+                    ? statusCount
+                    : 0;
+
+                <div class="dashboard-count-row">
+                    <span class="dashboard-count-label">
+                        <span class="status-badge @GetStatusClass(statusName)">
+                            @statusName
+                        </span>
+                    </span>
+                    <span class="dashboard-count-value">@count 件</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            カテゴリ別件数
+        </div>
+
+        <div class="dashboard-card-body">
+            @foreach (var categoryName in categories)
+            {
+                var count = Model.CategoryCounts.TryGetValue(categoryName, out var categoryCount)
+                    ? categoryCount
+                    : 0;
+
+                <div class="dashboard-count-row">
+                    <span class="dashboard-count-label">@categoryName</span>
+                    <span class="dashboard-count-value">@count 件</span>
+                </div>
+            }
+
+            @if (Model.CategoryCounts.TryGetValue("未入力", out var emptyCategoryCount))
+            {
+                <div class="dashboard-count-row">
+                    <span class="dashboard-count-label text-muted">未入力</span>
+                    <span class="dashboard-count-value">@emptyCategoryCount 件</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
 <form asp-action="Index" method="get" class="search-panel search-panel-grid search-panel-grid-with-sort">
     <input type="hidden" name="page" value="1" />
