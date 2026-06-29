@@ -32,4 +32,10 @@ public class CreateItemViewModel
 
     [StringLength(1000, ErrorMessage = "備考は1000文字以内で入力してください")]
     public string? Note { get; set; }
+
+    [Display(Name = "最終確認日")]
+    public DateTime? LastConfirmedAt { get; set; }
+
+    [StringLength(1000, ErrorMessage = "確認メモは1000文字以内で入力してください")]
+    public string? ConfirmationNote { get; set; }
 }

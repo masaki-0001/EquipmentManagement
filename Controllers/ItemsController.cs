@@ -90,6 +90,8 @@ public class ItemsController : Controller
             CsvEscape("使用者"),
             CsvEscape("状態"),
             CsvEscape("備考"),
+            CsvEscape("最終確認日"),
+            CsvEscape("確認メモ"),
             CsvEscape("登録日時"),
             CsvEscape("更新日時")));
 
@@ -106,6 +108,8 @@ public class ItemsController : Controller
                 CsvEscape(item.AssignedUser),
                 CsvEscape(item.Status),
                 CsvEscape(item.Note),
+                CsvEscape(FormatDate(item.LastConfirmedAt)),
+                CsvEscape(item.ConfirmationNote),
                 CsvEscape(FormatDateTime(item.CreatedAt)),
                 CsvEscape(FormatDateTime(item.UpdatedAt))));
         }
@@ -380,7 +384,9 @@ public class ItemsController : Controller
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
             Status = viewModel.Status,
-            Note = viewModel.Note
+            Note = viewModel.Note,
+            LastConfirmedAt = viewModel.LastConfirmedAt,
+            ConfirmationNote = viewModel.ConfirmationNote
         };
 
         _itemRepository.Add(item);
@@ -434,7 +440,9 @@ public class ItemsController : Controller
             Location = item.Location,
             AssignedUser = item.AssignedUser,
             Status = item.Status,
-            Note = item.Note
+            Note = item.Note,
+            LastConfirmedAt = item.LastConfirmedAt,
+            ConfirmationNote = item.ConfirmationNote
         };
 
         SetSelectLists();
@@ -501,13 +509,37 @@ public class ItemsController : Controller
             Location = viewModel.Location,
             AssignedUser = viewModel.AssignedUser,
             Status = viewModel.Status,
-            Note = viewModel.Note
+            Note = viewModel.Note,
+            LastConfirmedAt = viewModel.LastConfirmedAt,
+            ConfirmationNote = viewModel.ConfirmationNote
         };
 
         _itemRepository.Update(item);
         TempData["SuccessMessage"] = "備品情報を更新しました。";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult MarkAsConfirmed(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+
+        var updated = _itemRepository.MarkAsConfirmed(id);
+
+        if (!updated)
+        {
+            TempData["ErrorMessage"] = "対象の備品が見つかりませんでした。";
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["SuccessMessage"] = "確認日を今日に更新しました。";
+
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     [HttpPost]

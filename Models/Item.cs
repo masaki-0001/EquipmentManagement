@@ -26,6 +26,10 @@ public class Item
 
     public string? Note { get; set; }
 
+    public DateTime? LastConfirmedAt { get; set; }
+
+    public string? ConfirmationNote { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

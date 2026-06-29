@@ -13,6 +13,15 @@
     </div>
 
     <div class="detail-header-actions">
+        <form asp-action="MarkAsConfirmed"
+              asp-route-id="@Model.Id"
+              method="post"
+              class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-success">
+                確認日を今日に更新
+            </button>
+        </form>
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
             編集する
         </a>
@@ -127,6 +136,33 @@ else if (IsWarrantyExpiringSoon(Model.WarrantyUntil))
         <div class="detail-item">
             <dt>使用者</dt>
             <dd>@DisplayText(Model.AssignedUser)</dd>
+        </div>
+    </dl>
+</div>
+
+<div class="detail-section-card">
+    <div class="detail-section-header">
+        <h2 class="detail-section-title">棚卸し確認情報</h2>
+    </div>
+
+    <dl class="detail-grid">
+        <div class="detail-item">
+            <dt>最終確認日</dt>
+            <dd>
+                @if (Model.LastConfirmedAt.HasValue)
+                {
+                    <span>@Model.LastConfirmedAt.Value.ToString("yyyy/MM/dd")</span>
+                }
+                else
+                {
+                    <span class="confirmation-unconfirmed">未確認</span>
+                }
+            </dd>
+        </div>
+
+        <div class="detail-item detail-item-wide">
+            <dt>確認メモ</dt>
+            <dd class="detail-note">@DisplayText(Model.ConfirmationNote)</dd>
         </div>
     </dl>
 </div>

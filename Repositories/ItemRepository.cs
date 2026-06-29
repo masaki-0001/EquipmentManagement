@@ -231,9 +231,28 @@ public class ItemRepository
         existingItem.Location = item.Location;
         existingItem.AssignedUser = item.AssignedUser;
         existingItem.Note = item.Note;
+        existingItem.LastConfirmedAt = item.LastConfirmedAt;
+        existingItem.ConfirmationNote = item.ConfirmationNote;
         existingItem.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
+    }
+
+    public bool MarkAsConfirmed(int id)
+    {
+        var item = GetById(id);
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        item.LastConfirmedAt = DateTime.Today;
+        item.UpdatedAt = DateTime.Now;
+
+        _context.SaveChanges();
+
+        return true;
     }
 
     public bool MarkAsDisposed(int id)

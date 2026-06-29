@@ -559,3 +559,18 @@ input[readonly] {
         grid-template-columns: 1fr;
     }
 }
+
+/* Confirmation */
+.confirmation-unconfirmed {
+    display: inline-block;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #495057;
+    background-color: #e9ecef;
+}
+
+.detail-header-actions form {
+    margin: 0;
+}

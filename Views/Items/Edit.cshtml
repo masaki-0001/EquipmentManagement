@@ -151,6 +151,22 @@
                           placeholder="例：付属品、修理履歴、管理上の注意点など"></textarea>
                 <span asp-validation-for="Note" class="text-danger"></span>
             </div>
+
+            <div class="form-field">
+                <label asp-for="LastConfirmedAt" class="form-label">最終確認日</label>
+                <input asp-for="LastConfirmedAt" type="date" class="form-control" />
+                <span asp-validation-for="LastConfirmedAt" class="text-danger"></span>
+            </div>
+
+            <div class="form-field form-field-wide">
+                <label asp-for="ConfirmationNote" class="form-label">確認メモ</label>
+                <textarea asp-for="ConfirmationNote"
+                          class="form-control"
+                          rows="4"
+                          maxlength="1000"
+                          placeholder="例：現物確認済み、所在変更あり、使用者変更予定など"></textarea>
+                <span asp-validation-for="ConfirmationNote" class="text-danger"></span>
+            </div>
         </div>
     </div>
 
