@@ -11,25 +11,32 @@ public class ItemRepository
     {
         _context = context;
     }
-
     public int CountSearch(
         string? keyword,
         string? category,
         string? location,
-        string? status)
+        string? status,
+        string? confirmationFilter,
+        DateTime today)
     {
-        return BuildSearchQuery(keyword, category, location, status)
-            .Count();
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
+
+        return query.Count();
     }
 
     public int CountExpiredWarranty(
-    string? keyword,
-    string? category,
-    string? location,
-    string? status,
-    DateTime today)
+        string? keyword,
+        string? category,
+        string? location,
+        string? status,
+        string? confirmationFilter,
+        DateTime today)
     {
-        return BuildSearchQuery(keyword, category, location, status)
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
+
+        return query
             .Where(x => x.Status != "廃棄済み")
             .Where(x => x.WarrantyUntil.HasValue && x.WarrantyUntil.Value < today)
             .Count();
@@ -40,10 +47,14 @@ public class ItemRepository
         string? category,
         string? location,
         string? status,
+        string? confirmationFilter,
         DateTime today,
         DateTime limitDate)
     {
-        return BuildSearchQuery(keyword, category, location, status)
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
+
+        return query
             .Where(x => x.Status != "廃棄済み")
             .Where(x =>
                 x.WarrantyUntil.HasValue &&
@@ -52,13 +63,43 @@ public class ItemRepository
             .Count();
     }
 
-    public Dictionary<string, int> CountByStatus(
-    string? keyword,
-    string? category,
-    string? location,
-    string? status)
+    private static IQueryable<Item> ApplyConfirmationFilter(
+    IQueryable<Item> query,
+    string? confirmationFilter,
+    DateTime today)
     {
-        return BuildSearchQuery(keyword, category, location, status)
+        return confirmationFilter switch
+        {
+            "unconfirmed" => query.Where(x => !x.LastConfirmedAt.HasValue),
+
+            "over90days" => query.Where(x =>
+                x.LastConfirmedAt.HasValue &&
+                x.LastConfirmedAt.Value <= today.AddDays(-90)),
+
+            "over180days" => query.Where(x =>
+                x.LastConfirmedAt.HasValue &&
+                x.LastConfirmedAt.Value <= today.AddDays(-180)),
+
+            "over365days" => query.Where(x =>
+                x.LastConfirmedAt.HasValue &&
+                x.LastConfirmedAt.Value <= today.AddDays(-365)),
+
+            _ => query
+        };
+    }
+
+    public Dictionary<string, int> CountByStatus(
+        string? keyword,
+        string? category,
+        string? location,
+        string? status,
+        string? confirmationFilter,
+        DateTime today)
+    {
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
+
+        return query
             .GroupBy(x => x.Status)
             .Select(x => new
             {
@@ -72,9 +113,14 @@ public class ItemRepository
         string? keyword,
         string? category,
         string? location,
-        string? status)
+        string? status,
+        string? confirmationFilter,
+        DateTime today)
     {
-        return BuildSearchQuery(keyword, category, location, status)
+        var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
+
+        return query
             .Select(x => x.Category)
             .AsEnumerable()
             .GroupBy(x => string.IsNullOrWhiteSpace(x) ? "未入力" : x)
@@ -86,9 +132,11 @@ public class ItemRepository
         string? category,
         string? location,
         string? status,
+        string? confirmationFilter,
         string? sortOrder,
         int page,
-        int pageSize)
+        int pageSize,
+        DateTime today)
     {
         if (page < 1)
         {
@@ -101,6 +149,7 @@ public class ItemRepository
         }
 
         var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
         query = ApplySort(query, sortOrder);
 
         return query
@@ -110,13 +159,16 @@ public class ItemRepository
     }
 
     public List<Item> SearchForCsv(
-    string? keyword,
-    string? category,
-    string? location,
-    string? status,
-    string? sortOrder)
+        string? keyword,
+        string? category,
+        string? location,
+        string? status,
+        string? confirmationFilter,
+        string? sortOrder,
+        DateTime today)
     {
         var query = BuildSearchQuery(keyword, category, location, status);
+        query = ApplyConfirmationFilter(query, confirmationFilter, today);
         query = ApplySort(query, sortOrder);
 
         return query.ToList();

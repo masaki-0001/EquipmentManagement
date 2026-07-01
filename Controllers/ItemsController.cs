@@ -50,12 +50,22 @@ public class ItemsController : Controller
         { "warrantyUntilAsc", "保証期限が近い順" }
     };
 
+    private static readonly Dictionary<string, string> ConfirmationFilterOptions = new()
+{
+    { "all", "すべて" },
+    { "unconfirmed", "未確認" },
+    { "over90days", "90日以上未確認" },
+    { "over180days", "180日以上未確認" },
+    { "over365days", "1年以上未確認" }
+};
+
     private void SetSelectLists()
     {
         ViewBag.Statuses = ValidStatuses;
         ViewBag.Categories = ValidCategories;
         ViewBag.Locations = ValidLocations;
         ViewBag.SortOptions = SortOptions;
+        ViewBag.ConfirmationFilterOptions = ConfirmationFilterOptions;
     }
 
     private void ValidatePurchasePrice(decimal? purchasePrice, string fieldName)
@@ -166,6 +176,7 @@ public class ItemsController : Controller
         string? category,
         string? location,
         string? status,
+        string? confirmationFilter,
         string? sortOrder,
         int page = 1)
     {
@@ -206,15 +217,33 @@ public class ItemsController : Controller
             sortOrder = "managementNumber";
         }
 
+        if (string.IsNullOrWhiteSpace(confirmationFilter))
+        {
+            confirmationFilter = "all";
+        }
+
+        if (!ConfirmationFilterOptions.ContainsKey(confirmationFilter))
+        {
+            confirmationFilter = "all";
+        }
+
         if (page < 1)
         {
             page = 1;
         }
 
-        var totalCount = _itemRepository.CountSearch(keyword, category, location, status);
+        var today = DateTime.Today;
+
+        var totalCount = _itemRepository.CountSearch(
+            keyword,
+            category,
+            location,
+            status,
+            confirmationFilter,
+            today);
+
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-        var today = DateTime.Today;
         var warrantyAlertLimitDate = today.AddDays(30);
 
         var expiredWarrantyCount = _itemRepository.CountExpiredWarranty(
@@ -222,6 +251,7 @@ public class ItemsController : Controller
             category,
             location,
             status,
+            confirmationFilter,
             today);
 
         var expiringWarrantyCount = _itemRepository.CountExpiringWarranty(
@@ -229,6 +259,7 @@ public class ItemsController : Controller
             category,
             location,
             status,
+            confirmationFilter,
             today,
             warrantyAlertLimitDate);
 
@@ -236,20 +267,33 @@ public class ItemsController : Controller
             keyword,
             category,
             location,
-            status);
+            status,
+            confirmationFilter,
+            today);
 
         var categoryCounts = _itemRepository.CountByCategory(
             keyword,
             category,
             location,
-            status);
+            status,
+            confirmationFilter,
+            today);
 
         if (totalPages > 0 && page > totalPages)
         {
             page = totalPages;
         }
 
-        var items = _itemRepository.Search(keyword, category, location, status, sortOrder, page, pageSize);
+        var items = _itemRepository.Search(
+          keyword,
+          category,
+          location,
+          status,
+          confirmationFilter,
+          sortOrder,
+          page,
+          pageSize,
+          today);
 
         var viewModel = new ItemIndexViewModel
         {
@@ -258,6 +302,7 @@ public class ItemsController : Controller
             Category = category,
             Location = location,
             Status = status,
+            ConfirmationFilter = confirmationFilter,
             SortOrder = sortOrder,
             CurrentPage = page,
             PageSize = pageSize,
@@ -280,6 +325,7 @@ public class ItemsController : Controller
     string? category,
     string? location,
     string? status,
+    string? confirmationFilter,
     string? sortOrder)
     {
         if (!string.IsNullOrWhiteSpace(keyword) && keyword.Length > 100)
@@ -312,7 +358,26 @@ public class ItemsController : Controller
             sortOrder = "managementNumber";
         }
 
-        var items = _itemRepository.SearchForCsv(keyword, category, location, status, sortOrder);
+        if (string.IsNullOrWhiteSpace(confirmationFilter))
+        {
+            confirmationFilter = "all";
+        }
+
+        if (!ConfirmationFilterOptions.ContainsKey(confirmationFilter))
+        {
+            confirmationFilter = "all";
+        }
+
+        var today = DateTime.Today;
+
+        var items = _itemRepository.SearchForCsv(
+            keyword,
+            category,
+            location,
+            status,
+            confirmationFilter,
+            sortOrder,
+            today);
 
         var csv = BuildCsv(items);
         var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
