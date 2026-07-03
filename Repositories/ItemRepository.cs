@@ -120,6 +120,7 @@ public class ItemRepository
         var query = BuildSearchQuery(keyword, category, location, status);
         query = ApplyConfirmationFilter(query, confirmationFilter, today);
 
+
         return query
             .Select(x => x.Category)
             .AsEnumerable()

@@ -329,7 +329,11 @@
             {
                 @foreach (var item in Model.Items)
                 {
-                    <tr>
+                    var confirmationLabel = GetConfirmationLabel(item.LastConfirmedAt);
+                    var confirmationClass = GetConfirmationClass(item.LastConfirmedAt);
+                    var confirmationRowClass = GetConfirmationRowClass(item.LastConfirmedAt);
+
+                    <tr class="@confirmationRowClass">
                         <td class="text-nowrap item-management-number">@item.ManagementNumber</td>
                         <td class="item-name">@item.Name</td>
                         <td>@DisplayText(item.Category)</td>
@@ -367,12 +371,12 @@
                         <td class="text-nowrap">
                             @if (item.LastConfirmedAt.HasValue)
                             {
-                                <span>@item.LastConfirmedAt.Value.ToString("yyyy/MM/dd")</span>
+                                <div>@item.LastConfirmedAt.Value.ToString("yyyy/MM/dd")</div>
                             }
-                            else
-                            {
-                                <span class="confirmation-unconfirmed">未確認</span>
-                            }
+
+                            <span class="confirmation-badge @confirmationClass">
+                                @confirmationLabel
+                            </span>
                         </td>
                         <td>@DisplayText(item.Location)</td>
                         <td>@DisplayText(item.AssignedUser)</td>
@@ -596,5 +600,71 @@
         }
 
         return string.Empty;
+    }
+
+    private static string GetConfirmationLabel(DateTime? lastConfirmedAt)
+    {
+        if (!lastConfirmedAt.HasValue)
+        {
+            return "未確認";
+        }
+
+        var days = (DateTime.Today - lastConfirmedAt.Value.Date).Days;
+
+        if (days >= 365)
+        {
+            return "1年以上未確認";
+        }
+
+        if (days >= 180)
+        {
+            return "180日以上未確認";
+        }
+
+        if (days >= 90)
+        {
+            return "90日以上未確認";
+        }
+
+        return "確認済み";
+    }
+
+    private static string GetConfirmationClass(DateTime? lastConfirmedAt)
+    {
+        if (!lastConfirmedAt.HasValue)
+        {
+            return "confirmation-not-confirmed";
+        }
+
+        var days = (DateTime.Today - lastConfirmedAt.Value.Date).Days;
+
+        if (days >= 365)
+        {
+            return "confirmation-over-365";
+        }
+
+        if (days >= 180)
+        {
+            return "confirmation-over-180";
+        }
+
+        if (days >= 90)
+        {
+            return "confirmation-over-90";
+        }
+
+        return "confirmation-ok";
+    }
+
+    private static string GetConfirmationRowClass(DateTime? lastConfirmedAt)
+    {
+        if (!lastConfirmedAt.HasValue)
+        {
+            return "confirmation-row-attention";
+        }
+
+        var days = (DateTime.Today - lastConfirmedAt.Value.Date).Days;
+
+        return days >= 90 ? "confirmation-row-attention" : string.Empty;
     }
 }

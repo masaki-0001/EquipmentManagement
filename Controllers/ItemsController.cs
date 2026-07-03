@@ -51,13 +51,13 @@ public class ItemsController : Controller
     };
 
     private static readonly Dictionary<string, string> ConfirmationFilterOptions = new()
-{
-    { "all", "すべて" },
-    { "unconfirmed", "未確認" },
-    { "over90days", "90日以上未確認" },
-    { "over180days", "180日以上未確認" },
-    { "over365days", "1年以上未確認" }
-};
+    {
+        { "all", "すべて" },
+        { "unconfirmed", "未確認" },
+        { "over90days", "90日以上未確認" },
+        { "over180days", "180日以上未確認" },
+        { "over365days", "1年以上未確認" }
+    };
 
     private void SetSelectLists()
     {
