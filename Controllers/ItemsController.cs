@@ -587,7 +587,7 @@ public class ItemsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult MarkAsConfirmed(int id)
+    public IActionResult MarkAsConfirmed(int id, string? returnUrl)
     {
         if (id <= 0)
         {
@@ -599,6 +599,10 @@ public class ItemsController : Controller
         if (!updated)
         {
             TempData["ErrorMessage"] = "対象の備品が見つかりませんでした。";
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
             return RedirectToAction(nameof(Index));
         }
 

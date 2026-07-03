@@ -46,6 +46,7 @@
 
     var startPage = Math.Max(1, Model.CurrentPage - 2);
     var endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 
     if (endPage - startPage < 4)
     {
@@ -332,6 +333,7 @@
                     var confirmationLabel = GetConfirmationLabel(item.LastConfirmedAt);
                     var confirmationClass = GetConfirmationClass(item.LastConfirmedAt);
                     var confirmationRowClass = GetConfirmationRowClass(item.LastConfirmedAt);
+                    var needsConfirmation = NeedsConfirmation(item.LastConfirmedAt);
 
                     <tr class="@confirmationRowClass">
                         <td class="text-nowrap item-management-number">@item.ManagementNumber</td>
@@ -397,6 +399,21 @@
                                class="btn btn-sm btn-outline-primary">
                                 編集
                             </a>
+
+                            @if (needsConfirmation)
+                            {
+                                <form asp-action="MarkAsConfirmed"
+                                      asp-route-id="@item.Id"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('この備品の確認日を今日に更新します。よろしいですか？');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        今日確認
+                                    </button>
+                                </form>
+                            }
 
                             @if (item.Status != "廃棄済み")
                             {
@@ -666,5 +683,17 @@
         var days = (DateTime.Today - lastConfirmedAt.Value.Date).Days;
 
         return days >= 90 ? "confirmation-row-attention" : string.Empty;
+    }
+
+    private static bool NeedsConfirmation(DateTime? lastConfirmedAt)
+    {
+        if (!lastConfirmedAt.HasValue)
+        {
+            return true;
+        }
+
+        var days = (DateTime.Today - lastConfirmedAt.Value.Date).Days;
+
+        return days >= 90;
     }
 }
