@@ -85,6 +85,26 @@ public class ItemsController : Controller
         }
     }
 
+    private IActionResult RedirectToLocalUrlOrIndex(string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    private IActionResult RedirectAfterConfirmation(int id, string? returnUrl)
+    {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     private static string BuildCsv(List<Item> items)
     {
         var builder = new StringBuilder();
@@ -599,16 +619,12 @@ public class ItemsController : Controller
         if (!updated)
         {
             TempData["ErrorMessage"] = "対象の備品が見つかりませんでした。";
-            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                return LocalRedirect(returnUrl);
-            }
-            return RedirectToAction(nameof(Index));
+            return RedirectToLocalUrlOrIndex(returnUrl);
         }
 
         TempData["SuccessMessage"] = "確認日を今日に更新しました。";
 
-        return RedirectToAction(nameof(Details), new { id });
+        return RedirectAfterConfirmation(id, returnUrl);
     }
 
     [HttpPost]
