@@ -558,11 +558,6 @@
 }
 
 @functions {
-    private const int ConfirmationWarningDays = 90;
-    private const int ConfirmationCautionDays = 180;
-    private const int ConfirmationCriticalDays = 365;
-    private const int WarrantyExpiringDays = 30;
-
     private static string DisplayText(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "未入力" : value;
@@ -604,9 +599,9 @@
             return "期限切れ";
         }
 
-        if (days <= WarrantyExpiringDays)
+        if (days <= 30)
         {
-            return $"{WarrantyExpiringDays}日以内";
+            return "30日以内";
         }
 
         return string.Empty;
@@ -626,7 +621,7 @@
             return "warranty-expired";
         }
 
-        if (days <= WarrantyExpiringDays)
+        if (days <= 30)
         {
             return "warranty-expiring";
         }
@@ -653,19 +648,19 @@
             return "未確認";
         }
 
-        if (days >= ConfirmationCriticalDays)
+        if (days >= 365)
         {
             return "1年以上未確認";
         }   
 
-        if (days >= ConfirmationCautionDays)
+        if (days >= 180)
         {
-            return $"{ConfirmationCautionDays}日以内";
+            return "180日以上未確認";
         }
 
-        if (days >= ConfirmationWarningDays)
+        if (days >= 90)
         {
-            return $"{ConfirmationWarningDays}日以上未確認";
+            return "90日以上未確認";
         }
 
         return "確認済み";
@@ -680,17 +675,17 @@
             return "confirmation-not-confirmed";
         }
 
-        if (days >= ConfirmationCriticalDays)
+        if (days >= 365)
         {
             return "confirmation-over-365";
         }
 
-        if (days >= ConfirmationCautionDays)
+        if (days >= 180)
         {
             return "confirmation-over-180";
         }
 
-        if (days >= ConfirmationWarningDays)
+        if (days >= 90)
         {
             return "confirmation-over-90";
         }
@@ -707,7 +702,7 @@
             return "confirmation-row-attention";
         }
 
-        return days >= ConfirmationWarningDays ? "confirmation-row-attention" : string.Empty;
+        return days >= 90 ? "confirmation-row-attention" : string.Empty;
     }
 
     private static bool NeedsConfirmation(DateTime? lastConfirmedAt)
@@ -719,6 +714,6 @@
             return true;
         }
 
-        return days >= ConfirmationWarningDays;
+        return days >= 90;
     }
 }
