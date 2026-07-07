@@ -481,7 +481,7 @@ public class ItemsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Details(int id)
+    public IActionResult Details(int id, string? returnUrl)
     {
         if (id <= 0)
         {
@@ -493,6 +493,11 @@ public class ItemsController : Controller
         if (item is null)
         {
             return NotFound();
+        }
+
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            ViewBag.ReturnUrl = returnUrl;
         }
 
         return View(item);
@@ -629,7 +634,7 @@ public class ItemsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult MarkAsDisposed(int id)
+    public IActionResult MarkAsDisposed(int id, string? returnUrl)
     {
         if (id <= 0)
         {
@@ -641,17 +646,17 @@ public class ItemsController : Controller
         if (!updated)
         {
             TempData["ErrorMessage"] = "対象の備品が見つかりませんでした。";
-            return RedirectToAction(nameof(Index));
+            return RedirectToLocalUrlOrIndex(returnUrl);
         }
 
         TempData["SuccessMessage"] = "備品の状態を廃棄済みに変更しました。";
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToLocalUrlOrIndex(returnUrl);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Delete(int id)
+    public IActionResult Delete(int id, string? returnUrl)
     {
         if (id <= 0)
         {
@@ -663,11 +668,11 @@ public class ItemsController : Controller
         if (!deleted)
         {
             TempData["ErrorMessage"] = "台帳から非表示にできるのは、状態が廃棄済みの備品だけです。";
-            return RedirectToAction(nameof(Index));
+            return RedirectToLocalUrlOrIndex(returnUrl);
         }
 
         TempData["SuccessMessage"] = "廃棄済みの備品を台帳から非表示にしました。";
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToLocalUrlOrIndex(returnUrl);
     }
 }

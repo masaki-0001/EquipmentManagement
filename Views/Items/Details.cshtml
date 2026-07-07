@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "備品詳細";
+    var returnUrl = ViewBag.ReturnUrl as string;
 }
 
 <div class="page-header">
@@ -25,9 +26,18 @@
         <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
             編集する
         </a>
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            一覧に戻る
-        </a>
+        @if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            <a href="@returnUrl" class="btn btn-secondary">
+                一覧へ戻る
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">
+                一覧へ戻る
+            </a>
+        }
     </div>
 </div>
 
