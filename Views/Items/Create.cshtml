@@ -5,6 +5,7 @@
     var categories = ViewBag.Categories as string[] ?? Array.Empty<string>();
     var locations = ViewBag.Locations as string[] ?? Array.Empty<string>();
     var statuses = ViewBag.Statuses as string[] ?? Array.Empty<string>();
+    var returnUrl = ViewBag.ReturnUrl as string;
 }
 
 <div class="page-header">
@@ -15,13 +16,23 @@
         </p>
     </div>
 
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        一覧に戻る
-    </a>
+    @if (!string.IsNullOrWhiteSpace(returnUrl))
+    {
+        <a href="@returnUrl" class="btn btn-outline-secondary">
+            一覧に戻る
+        </a>
+    }
+    else
+    {
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            一覧に戻る
+        </a>
+    }
 </div>
 
 <form asp-action="Create" method="post" class="item-form">
     @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
 
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
@@ -164,7 +175,14 @@
 
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">登録する</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">キャンセル</a>
+        @if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            <a href="@returnUrl" class="btn btn-outline-secondary">キャンセル</a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-outline-secondary">キャンセル</a>
+        }
     </div>
 </form>
 

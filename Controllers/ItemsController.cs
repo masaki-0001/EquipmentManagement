@@ -413,8 +413,13 @@ public class ItemsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public IActionResult Create(string? returnUrl)
     {
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            ViewBag.ReturnUrl = returnUrl;
+        }
+
         SetSelectLists();
 
         return View(new CreateItemViewModel
@@ -426,7 +431,7 @@ public class ItemsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(CreateItemViewModel viewModel)
+    public IActionResult Create(CreateItemViewModel viewModel, string? returnUrl)
     {
         if (viewModel.PurchaseDate > DateTime.Today)
         {
@@ -455,6 +460,11 @@ public class ItemsController : Controller
 
         if (!ModelState.IsValid)
         {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                ViewBag.ReturnUrl = returnUrl;
+            }
+
             SetSelectLists();
             return View(viewModel);
         }
@@ -477,7 +487,7 @@ public class ItemsController : Controller
         _itemRepository.Add(item);
         TempData["SuccessMessage"] = "備品を登録しました。";
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = item.Id, returnUrl });
     }
 
     [HttpGet]
@@ -504,7 +514,7 @@ public class ItemsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Edit(int id)
+    public IActionResult Edit(int id, string? returnUrl)
     {
         if (id <= 0)
         {
@@ -535,6 +545,11 @@ public class ItemsController : Controller
             ConfirmationNote = item.ConfirmationNote
         };
 
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            ViewBag.ReturnUrl = returnUrl;
+        }
+
         SetSelectLists();
 
         return View(viewModel);
@@ -542,7 +557,7 @@ public class ItemsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(EditItemViewModel viewModel)
+    public IActionResult Edit(EditItemViewModel viewModel, string? returnUrl)
     {
         if (viewModel.Id <= 0)
         {
@@ -584,6 +599,11 @@ public class ItemsController : Controller
         if (!ModelState.IsValid)
         {
             viewModel.ManagementNumber = existingItem.ManagementNumber;
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                ViewBag.ReturnUrl = returnUrl;
+            }
+
             SetSelectLists();
             return View(viewModel);
         }
@@ -607,7 +627,7 @@ public class ItemsController : Controller
         _itemRepository.Update(item);
         TempData["SuccessMessage"] = "備品情報を更新しました。";
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = viewModel.Id, returnUrl });
     }
 
     [HttpPost]

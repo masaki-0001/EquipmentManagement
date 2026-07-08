@@ -16,14 +16,19 @@
     <div class="detail-header-actions">
         <form asp-action="MarkAsConfirmed"
               asp-route-id="@Model.Id"
+              asp-route-returnUrl="@returnUrl"
               method="post"
               class="d-inline">
             @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
             <button type="submit" class="btn btn-outline-success">
                 確認日を今日に更新
             </button>
         </form>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+        <a asp-action="Edit"
+           asp-route-id="@Model.Id"
+           asp-route-returnUrl="@returnUrl"
+           class="btn btn-primary">
             編集する
         </a>
         @if (!string.IsNullOrWhiteSpace(returnUrl))

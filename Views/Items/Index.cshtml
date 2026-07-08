@@ -81,7 +81,9 @@
             CSV出力
         </a>
 
-        <a asp-action="Create" class="btn btn-primary">
+        <a asp-action="Create"
+           asp-route-returnUrl="@returnUrl"
+           class="btn btn-primary">
             新規登録
         </a>
     </div>
